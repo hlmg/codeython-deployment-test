@@ -21,10 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
-	/**
-	 * exception : Ex000
-	 * category : HttpRequestMethodNotSupportedException
-	 */
+
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
 		HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -32,10 +29,6 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 			.body(new ExceptionResult(ex.getMessage()));
 	}
 
-	/**
-	 * exception : Ex001
-	 * category : IllegalInputException
-	 */
 	@ResponseStatus(BAD_REQUEST)
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ExceptionResult illegalInputException(IllegalArgumentException exception) {
