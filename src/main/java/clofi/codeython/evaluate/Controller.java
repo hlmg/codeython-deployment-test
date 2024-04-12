@@ -14,4 +14,9 @@ public class Controller {
     public String test(@RequestBody EvaluateRequest evaluateRequest) {
         return evaluator.evaluate(evaluateRequest);
     }
+
+    @GetMapping("/test2")
+    public String test2(@RequestBody EvaluateRequest evaluateRequest) {
+        return evaluator.evaluateJava(evaluateRequest);
+    }
 }
