@@ -11,8 +11,7 @@ public class Controller {
     private final Evaluator evaluator;
 
     @GetMapping("/test")
-    public String test(@RequestBody Code code) {
-        return evaluator.evaluate(code);
+    public String test(@RequestBody EvaluateRequest evaluateRequest) {
+        return evaluator.evaluate(evaluateRequest);
     }
-
 }

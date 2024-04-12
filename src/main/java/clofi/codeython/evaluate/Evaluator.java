@@ -11,10 +11,10 @@ import org.springframework.web.client.RestClient;
 public class Evaluator {
     private final RestClient client = RestClient.builder().baseUrl("https://emkc.org").build();
 
-    public String evaluate(Code code) {
+    public String evaluate(EvaluateRequest evaluateRequest) {
         ExecutionRequest executionRequest = new ExecutionRequest(
-                "javascript", "18.15.0",
-                List.of(code.getCode()));
+                evaluateRequest.getLanguage().getLanguage(), evaluateRequest.getLanguage().getVersion(),
+                List.of(evaluateRequest.getCode()));
 
         ResponseEntity<ExecutionResult> result = client.post()
                 .uri("/api/v2/piston/execute")
