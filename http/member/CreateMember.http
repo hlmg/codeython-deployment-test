@@ -3,7 +3,7 @@ POST localhost:8080/api/signup
 Content-Type: application/json
 
 {
-  "nickname": "짱우혁짱아님",
-  "username": "KoreanCow",
+  "nickname": "짱우혁짱아님2",
+  "username": "KoreanCow1",
   "password": "1q2w3e4r"
 }

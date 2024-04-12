@@ -17,7 +17,7 @@ public class CreateMemberRequest {
 
 	@NotBlank(message = "아이디는 공백일 수 없습니다.")
 	@Size(min = 6, max = 20, message = "아이디는 최소 6글자에서 최대 20글자입니다.")
-	@Pattern(regexp = "^[a-zA-Z]+$", message = "아이디는 영어 알파벳만 가능합니다.")
+	@Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영어 알파벳만 가능합니다.")
 	private String username;
 
 	@NotBlank(message = "비밀번호는 공백일 수 없습니다.")

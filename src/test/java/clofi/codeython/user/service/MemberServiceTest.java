@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import clofi.codeython.common.domain.IllegalInputException;
 import clofi.codeython.user.domain.Member;
 import clofi.codeython.user.domain.request.CreateMemberRequest;
 import clofi.codeython.user.repository.MemberRepository;
@@ -63,7 +62,7 @@ class MemberServiceTest {
 		);
 		//when //then
 		assertThatThrownBy(() ->
-			memberService.signUp(createMemberRequest)).isInstanceOf(IllegalInputException.class)
+			memberService.signUp(createMemberRequest)).isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("이미 존재한 닉네임입니다.");
 	}
 
@@ -85,7 +84,7 @@ class MemberServiceTest {
 		);
 		//when //then
 		assertThatThrownBy(() ->
-			memberService.signUp(createMemberRequest)).isInstanceOf(IllegalInputException.class)
+			memberService.signUp(createMemberRequest)).isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("이미 존재하는 아이디 입니다.");
 	}
 }
