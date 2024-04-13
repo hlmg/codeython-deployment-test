@@ -15,6 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import clofi.codeython.common.domain.dto.ExceptionResult;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @RestControllerAdvice
@@ -32,6 +33,12 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 	@ResponseStatus(BAD_REQUEST)
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ExceptionResult illegalInputException(IllegalArgumentException exception) {
+		return new ExceptionResult(exception.getMessage());
+	}
+
+	@ResponseStatus(NOT_FOUND)
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ExceptionResult entityNotFoundException(EntityNotFoundException exception) {
 		return new ExceptionResult(exception.getMessage());
 	}
 }

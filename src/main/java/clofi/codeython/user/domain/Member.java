@@ -3,6 +3,7 @@ package clofi.codeython.user.domain;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import clofi.codeython.common.domain.BaseEntity;
 import jakarta.persistence.Column;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @DynamicInsert
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member extends BaseEntity {
@@ -45,6 +47,10 @@ public class Member extends BaseEntity {
 	public Member(String username, String password, String nickname) {
 		this.username = username;
 		this.password = password;
+		this.nickname = nickname;
+	}
+
+	public void updateNickName(String nickname) {
 		this.nickname = nickname;
 	}
 }
