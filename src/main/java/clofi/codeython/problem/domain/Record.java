@@ -21,5 +21,6 @@ public class Record {
     @Column(name = "language", nullable = false, length = 20)
     private String language;
 
+    @Column(name = "rate", nullable = false, columnDefinition = "int default 0")
     private int rate;
 }

@@ -24,7 +24,7 @@ public class Problem {
     @Column(name = "limit_time", nullable = false)
     private int limitTime;
 
-    @Column(name = "difficulty", nullable = false)
+    @Column(name = "difficulty", nullable = false, columnDefinition = "int default 1")
     private int difficulty;
 
     @Column(name = "deleted_at")
