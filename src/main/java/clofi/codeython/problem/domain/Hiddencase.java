@@ -1,8 +1,9 @@
 package clofi.codeython.problem.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
-@Entity
+@Entity @Getter
 public class Hiddencase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
