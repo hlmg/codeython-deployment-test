@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 public class ResultCalculator {
     private final TestRunner testRunner;
 
-    public int calculate(List<Hiddencase> hiddencases, String route) throws IOException {
+    public int calculate(List<Hiddencase> hiddencases, String route, String outputType) throws IOException {
         int total = hiddencases.size();
         int success = 0;
         for (Hiddencase hiddencase : hiddencases) {
-            boolean result = testRunner.run(route, hiddencase.getInputs(), hiddencase.getOutput());
+            boolean result = testRunner.run(route, hiddencase.getInputs(), hiddencase.getOutput(), outputType);
             if (result) {
                 success++;
             }

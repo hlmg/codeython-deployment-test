@@ -26,7 +26,7 @@ public class JudgeService {
     public int judge(JudgeRequest judgeRequest) throws IOException {
         // TODO: 문제 번호로 문제 조회하기
         Problem problem = new Problem(List.of(
-                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2,4,6,8,10]"),
+                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2, 4, 6, 8, 10]"),
                 new Hiddencase(List.of("4", "[1,2,3,4]"), "[2,4,6,8]"),
                 new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2,4,6,8,10]")
         ), List.of("int", "int[]"), "int[]");
@@ -35,7 +35,7 @@ public class JudgeService {
         createFolder(route);
         // TODO: 언어에 맞는 구현체 사용
         runtimeEnvironmentCreator.config(problem.inputTypes, judgeRequest.getCode(), route);
-        int result = resultCalculator.calculate(problem.hiddencases, route);
+        int result = resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
         cleanup(route);
         return result;
     }

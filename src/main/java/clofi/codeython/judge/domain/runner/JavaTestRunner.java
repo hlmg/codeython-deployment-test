@@ -1,5 +1,7 @@
 package clofi.codeython.judge.domain.runner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Component;
 public class JavaTestRunner implements TestRunner {
 
     @Override
-    public boolean run(String route, List<String> inputs, String output) throws IOException {
+    public boolean run(String route, List<String> inputs, String output, String outputType) throws IOException {
         String executionResult = execute(route, inputs);
-        return match(executionResult, output);
+        return match(executionResult, output, outputType);
     }
 
     private String execute(String route, List<String> inputs) throws IOException {
@@ -45,10 +47,33 @@ public class JavaTestRunner implements TestRunner {
         return builder.toString();
     }
 
-    private boolean match(String executionResult, String output) {
+    // TODO: Matcher 클래스로 분리하기
+    private boolean match(String executionResult, String output, String outputType) {
         executionResult = executionResult.trim();
+        ObjectMapper mapper = new ObjectMapper();
+        Class<?> clazz = getClass(outputType);
+        try {
+            output = mapper.writeValueAsString(mapper.readValue(output, clazz));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         log.info("executionResult={}{}", System.lineSeparator(), executionResult);
         log.info("output={}{}", System.lineSeparator(), output);
+
         return executionResult.equals(output);
+    }
+
+    private Class<?> getClass(String type) {
+        return switch (type) {
+            case "int" -> int.class;
+            case "int[]" -> int[].class;
+            case "double" -> double.class;
+            case "double[]" -> double[].class;
+            case "String" -> String.class;
+            case "String[]" -> String[].class;
+            case "boolean" -> boolean.class;
+            case "boolean[]" -> boolean[].class;
+            default -> throw new IllegalArgumentException("Invalid output type");
+        };
     }
 }
