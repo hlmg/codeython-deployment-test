@@ -38,8 +38,6 @@ public class JWTFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		System.out.println("authorization now");
-		//Bearer 부분 제거 후 순수 토큰만 획득
 		String token = authorization.split(" ")[1];
 
 		//토큰 소멸 시간 검증
@@ -52,22 +50,17 @@ public class JWTFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		//토큰에서 username과 role 획득
 		String username = jwtUtil.getUsername(token);
 
-		//userEntity를 생성하여 값 set
 		Member member = new Member(
 			username,
 			"temppassword"
 		);
 
-		//UserDetails에 회원 정보 객체 담기
 		CustomMemberDetails customMemberDetails = new CustomMemberDetails(member);
 
-		//스프링 시큐리티 인증 토큰 생성
 		Authentication authToken = new UsernamePasswordAuthenticationToken(customMemberDetails, null,
 			customMemberDetails.getAuthorities());
-		//세션에 사용자 등록
 		SecurityContextHolder.getContext().setAuthentication(authToken);
 
 		filterChain.doFilter(request, response);
