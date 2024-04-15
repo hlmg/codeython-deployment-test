@@ -1,5 +1,8 @@
-package clofi.codeython.evaluate;
+package clofi.codeython.judge.service;
 
+import clofi.codeython.judge.dto.JudgeRequest;
+import clofi.codeython.judge.domain.Hiddencase;
+import clofi.codeython.judge.domain.Problem;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -17,9 +20,9 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class Evaluator {
+public class JudgeService {
 
-    public int executeJudge(EvaluateRequest evaluateRequest) throws IOException {
+    public int judge(JudgeRequest judgeRequest) throws IOException {
         // 요청: 문제 번호, 코드, 회원 정보, 언어
         // TODO: 문제 번호로 문제 조회하기
         Problem problem = new Problem(List.of(
@@ -30,15 +33,15 @@ public class Evaluator {
 
         // 타입 정보로 실행 환경 구성
         String route = UUID.randomUUID() + "/";
-        createExecutionEnvironment(problem.inputTypes, evaluateRequest.getCode(), route);
+        createExecutionEnvironment(problem.inputTypes, judgeRequest.getCode(), route);
 
         // 코드 실행
         int total = problem.hiddencases.size();
         int success = 0;
         for (Hiddencase hiddencase : problem.hiddencases) {
             String executionResult = execute(route, hiddencase.getInputs());
-            boolean judge = judge(executionResult, hiddencase.getOutput());
-            if (judge) {
+            boolean match = match(executionResult, hiddencase.getOutput());
+            if (match) {
                 success++;
             }
         }
@@ -155,7 +158,7 @@ public class Evaluator {
         return builder.toString();
     }
 
-    private boolean judge(String executionResult, String output) {
+    private boolean match(String executionResult, String output) {
         executionResult = executionResult.trim();
         log.info("executionResult={}{}", System.lineSeparator(), executionResult);
         log.info("output={}{}", System.lineSeparator(), output);

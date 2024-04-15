@@ -1,4 +1,4 @@
-package clofi.codeython.evaluate;
+package clofi.codeython.judge.domain;
 
 import java.util.List;
 import lombok.Getter;
