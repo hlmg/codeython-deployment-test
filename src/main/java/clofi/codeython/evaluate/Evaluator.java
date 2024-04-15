@@ -1,87 +1,172 @@
 package clofi.codeython.evaluate;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 
+@Slf4j
 @Component
 public class Evaluator {
-    private final RestClient client = RestClient.builder().baseUrl("https://emkc.org").build();
 
-    public String evaluate(EvaluateRequest evaluateRequest) {
-        ExecutionRequest executionRequest = new ExecutionRequest(
-                evaluateRequest.getLanguage().getLanguage(), evaluateRequest.getLanguage().getVersion(),
-                List.of(evaluateRequest.getCode()));
+    public int executeJudge(EvaluateRequest evaluateRequest) throws IOException {
+        // 요청: 문제 번호, 코드, 회원 정보, 언어
+        // TODO: 문제 번호로 문제 조회하기
+        Problem problem = new Problem(List.of(
+                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2,4,6,8,10]"),
+                new Hiddencase(List.of("4", "[1,2,3,4]"), "[2,4,6,8]"),
+                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2,4,6,8,10]")
+        ), List.of("int", "int[]"), "int[]");
 
-        ResponseEntity<ExecutionResult> result = client.post()
-                .uri("/api/v2/piston/execute")
-                .body(executionRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    HttpStatusCode statusCode = response.getStatusCode();
-                    HttpHeaders headers = response.getHeaders();
-                    System.out.println("statusCode = " + statusCode);
-                    System.out.println("headers = " + headers);
+        // 타입 정보로 실행 환경 구성
+        String route = UUID.randomUUID() + "/";
+        createExecutionEnvironment(problem.inputTypes, evaluateRequest.getCode(), route);
 
-                })
-                .toEntity(ExecutionResult.class);
+        // 코드 실행
+        int total = problem.hiddencases.size();
+        int success = 0;
+        for (Hiddencase hiddencase : problem.hiddencases) {
+            String executionResult = execute(route, hiddencase.getInputs());
+            boolean judge = judge(executionResult, hiddencase.getOutput());
+            if (judge) {
+                success++;
+            }
+        }
+        int result = success * 100 / total;
 
-        System.out.println("Response status: " + result.getStatusCode());
-        System.out.println("Response headers: " + result.getHeaders());
-        System.out.println("Contents: " + result.getBody());
-        return result.getBody().getRun().getOutput();
+        cleanup(route);
+        return result;
     }
 
-    public String evaluateJava(EvaluateRequest evaluateRequest) {
-        //TODO: evaludateRequest의 문제 번호로 문제 조회하기
-        Problem problem = new Problem(List.of("5", "new int[]{1,2,3,4,5}"), "2,4,6,8,10");
-
-        String code = evaluateRequest.getCode();
-        String javaCode = getJavaCode(code, problem.inputs);
-
-        System.out.println(javaCode);
-
-        ExecutionRequest executionRequest = new ExecutionRequest(
-                evaluateRequest.getLanguage().getLanguage(), evaluateRequest.getLanguage().getVersion(),
-                List.of(javaCode));
-
-        ResponseEntity<ExecutionResult> result = client.post()
-                .uri("/api/v2/piston/execute")
-                .body(executionRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    HttpStatusCode statusCode = response.getStatusCode();
-                    HttpHeaders headers = response.getHeaders();
-                    System.out.println("statusCode = " + statusCode);
-                    System.out.println("headers = " + headers);
-
-                })
-                .toEntity(ExecutionResult.class);
-
-        System.out.println("Contents: " + result.getBody());
-        return result.getBody().getRun().getOutput();
+    private void createExecutionEnvironment(List<String> inputTypes, String code, String route) {
+        createFolder(route);
+        // TODO: Main 코드 문제별로 고정이기 때문에 저장하고 재사용하게 변경
+        createMainFile(route, inputTypes);
+        createSolutionFile(route, code);
+        compile(route);
     }
 
-    public String getJavaCode(String code, List<String> inputs) {
-        String input = String.join(",", inputs);
+    private void createFolder(String route) {
+        route = route.substring(0, route.length() - 1);
+        try {
+            Files.createDirectory(Path.of(route));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-        String importStatement = code.substring(0, code.indexOf("class Solution {"));
-        code = code.substring(code.indexOf("class Solution {"));
+    private void createMainFile(String route, List<String> inputTypes) {
+        String code = getMainCode(inputTypes);
+        createFile(route, code, "Main.java");
+    }
 
-        String basecode = """
-                %s
+    private String getMainCode(List<String> inputTypes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("""
+                import com.fasterxml.jackson.core.JsonProcessingException;
+                import com.fasterxml.jackson.databind.ObjectMapper;
+
                 public class Main {
-                    public static void main(String[] args) {
-                        Solution solution = new Solution();
-                        solution.solution(%s);
-                    }
-                }
-                %s
-                """;
+                    public static void main(String[] args) throws JsonProcessingException {
+                        Solution s = new Solution();
+                        ObjectMapper mapper = new ObjectMapper();
+                """);
 
-        return String.format(basecode, importStatement, input, code);
+        sb.append("System.out.print(mapper.writeValueAsString(s.solution(");
+
+        for (int i = 0; i < inputTypes.size(); i++) {
+            sb.append(String.format("""
+                            mapper.readValue(args[%d], %s.class)""",
+                    i, inputTypes.get(i)));
+
+            if (i != inputTypes.size() - 1) {
+                sb.append(",");
+            }
+        }
+
+        sb.append(")));}}");
+        return sb.toString();
+    }
+
+    private void createFile(String route, String content, String fileName) {
+        try (PrintWriter printWriter = new PrintWriter(new FileWriter(route + fileName))) {
+            printWriter.print(content);
+        } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
+    private void createSolutionFile(String route, String code) {
+        createFile(route, code, "Solution.java");
+    }
+
+    private void compile(String route) {
+        log.info("Compiling... route={}", route);
+
+        ArrayList<String> commands = new ArrayList<>(
+                List.of("javac", "-cp", String.format("./libs/*:./%s", route), String.format("%sMain.java", route)));
+        ProcessBuilder pb = new ProcessBuilder(commands);
+        File error = new File(route + "error.txt");
+
+        pb.redirectError(error);
+        try {
+            Process process = pb.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("Successfully Compiled");
+    }
+
+    // TODO: Exception catch 로 수정하기
+    private String execute(String route, List<String> inputs) throws IOException {
+        ArrayList<String> commands = new ArrayList<>(
+                List.of("java", "-cp", String.format("./libs/*:./%s", route), "Main"));
+
+        for (String input : inputs) {
+            commands.add(String.format("%s", input));
+        }
+
+        ProcessBuilder pb = new ProcessBuilder(commands);
+        File error = new File(route + "error.txt");
+        pb.redirectError(error);
+
+        Process proc = pb.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        StringBuilder builder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+            builder.append(System.lineSeparator());
+        }
+
+        return builder.toString();
+    }
+
+    private boolean judge(String executionResult, String output) {
+        executionResult = executionResult.trim();
+        log.info("executionResult={}{}", System.lineSeparator(), executionResult);
+        log.info("output={}{}", System.lineSeparator(), output);
+        return executionResult.equals(output);
+    }
+
+    private void cleanup(String route) {
+        try {
+            FileUtils.deleteDirectory(new File(route));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

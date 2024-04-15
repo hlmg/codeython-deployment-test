@@ -6,11 +6,13 @@ import lombok.Getter;
 // TODO: 채점 기능에서 활용할 임시 클래스
 @Getter
 public class Problem {
-    public List<String> inputs;
-    public String output;
+    public List<Hiddencase> hiddencases;
+    public List<String> inputTypes;
+    public String outputType;
 
-    public Problem(List<String> inputs, String output) {
-        this.inputs = inputs;
-        this.output = output;
+    public Problem(List<Hiddencase> hiddencases, List<String> inputTypes, String outputType) {
+        this.hiddencases = hiddencases;
+        this.inputTypes = inputTypes;
+        this.outputType = outputType;
     }
 }

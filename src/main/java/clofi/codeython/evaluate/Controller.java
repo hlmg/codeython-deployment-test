@@ -1,7 +1,8 @@
 package clofi.codeython.evaluate;
 
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,13 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class Controller {
     private final Evaluator evaluator;
 
-    @GetMapping("/test")
-    public String test(@RequestBody EvaluateRequest evaluateRequest) {
-        return evaluator.evaluate(evaluateRequest);
-    }
-
-    @GetMapping("/test2")
-    public String test2(@RequestBody EvaluateRequest evaluateRequest) {
-        return evaluator.evaluateJava(evaluateRequest);
+    @PostMapping("/submit")
+    public int submit(@RequestBody EvaluateRequest evaluateRequest) throws IOException {
+        return evaluator.executeJudge(evaluateRequest);
     }
 }
