@@ -2,10 +2,14 @@ package clofi.codeython.problem.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
 
 @Entity @Getter
+@DynamicInsert
+@NoArgsConstructor
 public class Problem {
 
     @Id
@@ -19,8 +23,8 @@ public class Problem {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "constraint", columnDefinition = "TEXT")
-    private String constraint;
+    @Column(name = "limit_factor", columnDefinition = "TEXT")
+    private String limitFactor;
 
     @Column(name = "limit_time", nullable = false)
     private int limitTime;
@@ -31,11 +35,11 @@ public class Problem {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public Problem(String title, String content, String constraint,
+    public Problem(String title, String content, String limitFactor,
                    int limitTime, int difficulty) {
         this.title = title;
         this.content = content;
-        this.constraint = constraint;
+        this.limitFactor = limitFactor;
         this.limitTime = limitTime;
         this.difficulty = difficulty;
     }

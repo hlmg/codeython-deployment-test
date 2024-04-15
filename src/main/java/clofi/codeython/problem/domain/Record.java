@@ -3,8 +3,10 @@ package clofi.codeython.problem.domain;
 import clofi.codeython.user.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity @Getter
+@NoArgsConstructor
 public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
