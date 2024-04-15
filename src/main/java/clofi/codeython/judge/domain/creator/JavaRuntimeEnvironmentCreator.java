@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class JavaRuntimeEnvironmentCreator implements RuntimeEnvironmentCreator {
 
     @Override
-    public void config(List<String> inputTypes, String code, String route) {
+    public void create(List<String> inputTypes, String code, String route) {
         // TODO: Main 코드 문제별로 고정이기 때문에 repository에 저장하고 재사용하게 변경
         createMainFile(route, inputTypes);
         createSolutionFile(route, code);

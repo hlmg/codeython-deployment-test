@@ -34,7 +34,7 @@ public class JudgeService {
         String route = UUID.randomUUID() + "/";
         createFolder(route);
         // TODO: 언어에 맞는 구현체 사용
-        runtimeEnvironmentCreator.config(problem.inputTypes, judgeRequest.getCode(), route);
+        runtimeEnvironmentCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
         int result = resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
         cleanup(route);
         return result;
