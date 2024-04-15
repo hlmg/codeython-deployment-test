@@ -1,4 +1,4 @@
-package clofi.codeython.user.domain.request;
+package clofi.codeython.member.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

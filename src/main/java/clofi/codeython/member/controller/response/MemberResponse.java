@@ -1,6 +1,6 @@
-package clofi.codeython.user.controller.response;
+package clofi.codeython.member.controller.response;
 
-import clofi.codeython.user.domain.Member;
+import clofi.codeython.member.domain.Member;
 
 public record MemberResponse(
 	String nickname,
