@@ -1,4 +1,4 @@
-package clofi.codeython.user.domain;
+package clofi.codeython.member.domain;
 
 import java.time.LocalDateTime;
 
@@ -48,6 +48,11 @@ public class Member extends BaseEntity {
 		this.username = username;
 		this.password = password;
 		this.nickname = nickname;
+	}
+
+	public Member(String username, String password) {
+		this.username = username;
+		this.password = password;
 	}
 
 	public void updateNickName(String nickname) {
