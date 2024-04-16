@@ -15,8 +15,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+
+import clofi.codeython.common.domain.dto.ExceptionResult;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -44,5 +50,10 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 		String submessage = message.substring(message.indexOf("problem: ") + 9);
 		ExceptionResult exceptionResult = new ExceptionResult(submessage);
 		return ResponseEntity.badRequest().body(exceptionResult);
+    
+	@ResponseStatus(NOT_FOUND)
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ExceptionResult entityNotFoundException(EntityNotFoundException exception) {
+		return new ExceptionResult(exception.getMessage());
 	}
 }

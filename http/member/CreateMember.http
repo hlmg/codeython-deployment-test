@@ -7,3 +7,24 @@ Content-Type: application/json
   "username": "KoreanCow1",
   "password": "1q2w3e4r"
 }
+
+### 로그인
+POST localhost:8080/api/login
+Content-Type: application/json
+
+{
+  "username": "KoreanCow1",
+  "password": "1q2w3e4r"
+}
+
+### 회원정보수정
+PATCH localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "nickname": "zeno"
+}
+
+### 회원정보 조회
+GET localhost:8080/api/users/1
+Content-Type: application/json

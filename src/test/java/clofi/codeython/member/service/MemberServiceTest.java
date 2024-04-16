@@ -1,4 +1,4 @@
-package clofi.codeython.user.service;
+package clofi.codeython.member.service;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import clofi.codeython.user.domain.Member;
-import clofi.codeython.user.domain.request.CreateMemberRequest;
-import clofi.codeython.user.repository.MemberRepository;
+import clofi.codeython.member.domain.Member;
+import clofi.codeython.member.domain.request.CreateMemberRequest;
+import clofi.codeython.member.domain.request.UpdateMemberRequest;
+import clofi.codeython.member.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -35,7 +37,8 @@ class MemberServiceTest {
 		);
 		//when
 		Long memberId = memberService.signUp(createMemberRequest);
-		Member member = memberRepository.findAllByUserNo(memberId);
+		Member member = memberRepository.findByUserNo(memberId)
+			.orElseThrow(() -> new EntityNotFoundException("일치하는 사용자가 없습니다."));
 		//then
 
 		assertThat(member.getUsername()).isEqualTo("zeno1030");
@@ -86,5 +89,46 @@ class MemberServiceTest {
 		assertThatThrownBy(() ->
 			memberService.signUp(createMemberRequest)).isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("이미 존재하는 아이디 입니다.");
+	}
+
+	@DisplayName("닉네임을 업데이트할 수 있다.")
+	@Test
+	void updateTest() {
+		//given
+		Member member = new Member(
+			"zeno1030",
+			"wl3648",
+			"rnfmal"
+		);
+		memberRepository.save(member);
+		UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest(
+			"zeno"
+		);
+		//when
+		memberService.update(member.getUsername(), updateMemberRequest);
+		Member updatedMember = memberRepository.findByUserNo(member.getUserNo())
+			.orElseThrow(() -> new EntityNotFoundException("일치하는 사용자가 없습니다."));
+		//then
+		assertThat(updatedMember.getNickname()).isEqualTo("zeno");
+	}
+
+	@DisplayName("사용자의 정보를 조회할 수 있다.")
+	@Test
+	void getMemberTest() {
+		//given
+		Member member = new Member(
+			"zeno1030",
+			"wl3648",
+			"rnfmal"
+		);
+		memberRepository.save(member);
+		//when
+		Member memberInfo = memberRepository.findByUserNo(member.getUserNo())
+			.orElseThrow(() -> new EntityNotFoundException("일치하는 사용자가 없습니다."));
+		//then
+		assertThat(memberInfo.getNickname()).isEqualTo("rnfmal");
+		assertThat(memberInfo.getExp()).isEqualTo(0);
+		assertThat(memberInfo.getLevel()).isEqualTo(1);
+
 	}
 }

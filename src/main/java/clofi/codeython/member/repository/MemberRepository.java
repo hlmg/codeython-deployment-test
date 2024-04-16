@@ -1,11 +1,16 @@
-package clofi.codeython.user.repository;
+package clofi.codeython.member.repository;
+
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import clofi.codeython.user.domain.Member;
+import clofi.codeython.member.domain.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-	Member findAllByUserNo(Long userNo);
+
+	Optional<Member> findByUserNo(Long userNo);
+
+	Member findByUsername(String userName);
 
 	Boolean existsByNickname(String nickName);
 
