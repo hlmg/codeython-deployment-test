@@ -26,8 +26,8 @@ public class JudgeService {
     // TODO: 실제 문제 저장소로 변경하기
     private final TempProblemRepository tempProblemRepository;
 
-    public int judge(JudgeRequest judgeRequest) {
-        Problem problem = tempProblemRepository.findByProblemNo(judgeRequest.getProblemNo())
+    public int judge(JudgeRequest judgeRequest, Long problemNo) {
+        Problem problem = tempProblemRepository.findByProblemNo(problemNo)
                 .orElseThrow(() -> new IllegalArgumentException("없는 문제 번호입니다."));
 
         String route = UUID.randomUUID() + "/";
