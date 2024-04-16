@@ -1,6 +1,6 @@
 package clofi.codeython.problem.domain;
 
-import clofi.codeython.user.domain.Member;
+import clofi.codeython.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
