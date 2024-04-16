@@ -2,7 +2,6 @@ package clofi.codeython.judge.controller;
 
 import clofi.codeython.judge.dto.JudgeRequest;
 import clofi.codeython.judge.service.JudgeService;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +13,7 @@ public class JudgeController {
     private final JudgeService judgeService;
 
     @PostMapping("/submit")
-    public int submit(@RequestBody JudgeRequest judgeRequest) throws IOException {
+    public int submit(@RequestBody JudgeRequest judgeRequest) {
         return judgeService.judge(judgeRequest);
     }
 }

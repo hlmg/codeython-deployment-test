@@ -2,6 +2,6 @@ package clofi.codeython.judge.domain.creator;
 
 import java.util.List;
 
-public interface RuntimeEnvironmentCreator {
+public interface ExecutionFileCreator {
     void create(List<String> inputTypes, String code, String route);
 }

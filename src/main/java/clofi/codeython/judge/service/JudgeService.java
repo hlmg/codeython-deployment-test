@@ -3,7 +3,7 @@ package clofi.codeython.judge.service;
 import clofi.codeython.judge.domain.Hiddencase;
 import clofi.codeython.judge.domain.Problem;
 import clofi.codeython.judge.domain.ResultCalculator;
-import clofi.codeython.judge.domain.creator.RuntimeEnvironmentCreator;
+import clofi.codeython.judge.domain.creator.ExecutionFileCreator;
 import clofi.codeython.judge.dto.JudgeRequest;
 import java.io.File;
 import java.io.IOException;
@@ -20,10 +20,10 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class JudgeService {
-    private final RuntimeEnvironmentCreator runtimeEnvironmentCreator;
+    private final ExecutionFileCreator executionFileCreator;
     private final ResultCalculator resultCalculator;
 
-    public int judge(JudgeRequest judgeRequest) throws IOException {
+    public int judge(JudgeRequest judgeRequest) {
         // TODO: 문제 번호로 문제 조회하기
         Problem problem = new Problem(List.of(
                 new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2, 4, 6, 8, 10]"),
@@ -34,18 +34,17 @@ public class JudgeService {
         String route = UUID.randomUUID() + "/";
         createFolder(route);
         // TODO: 언어에 맞는 구현체 사용
-        runtimeEnvironmentCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
+        executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
         int result = resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
         cleanup(route);
         return result;
     }
 
     private void createFolder(String route) {
-        route = route.substring(0, route.length() - 1);
         try {
             Files.createDirectory(Path.of(route));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -53,7 +52,7 @@ public class JudgeService {
         try {
             FileUtils.deleteDirectory(new File(route));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class JavaRuntimeEnvironmentCreator implements RuntimeEnvironmentCreator {
+public class JavaExecutionFileCreator implements ExecutionFileCreator {
 
     @Override
     public void create(List<String> inputTypes, String code, String route) {
@@ -29,13 +29,13 @@ public class JavaRuntimeEnvironmentCreator implements RuntimeEnvironmentCreator 
     private String getMainCode(List<String> inputTypes) {
         StringBuilder sb = new StringBuilder();
         sb.append("""
-                import com.fasterxml.jackson.core.JsonProcessingException;
                 import com.fasterxml.jackson.databind.ObjectMapper;
 
                 public class Main {
-                    public static void main(String[] args) throws JsonProcessingException {
+                    public static void main(String[] args) {
                         Solution s = new Solution();
                         ObjectMapper mapper = new ObjectMapper();
+                        try {
                 """);
 
         sb.append("System.out.print(mapper.writeValueAsString(s.solution(");
@@ -50,7 +50,12 @@ public class JavaRuntimeEnvironmentCreator implements RuntimeEnvironmentCreator 
             }
         }
 
-        sb.append(")));}}");
+        sb.append("""
+                )));
+                } catch (Exception e) {
+                    System.out.print(e);
+                }
+                }}""");
         return sb.toString();
     }
 
