@@ -1,35 +1,34 @@
 package clofi.codeython.judge.service;
 
-import clofi.codeython.judge.domain.Hiddencase;
 import clofi.codeython.judge.domain.Problem;
 import clofi.codeython.judge.domain.ResultCalculator;
 import clofi.codeython.judge.domain.creator.ExecutionFileCreator;
 import clofi.codeython.judge.dto.JudgeRequest;
+import clofi.codeython.judge.repository.TempProblemRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @AllArgsConstructor
-@Component
+@Transactional(readOnly = true)
+@Service
 public class JudgeService {
     private final ExecutionFileCreator executionFileCreator;
     private final ResultCalculator resultCalculator;
+    // TODO: 실제 문제 저장소로 변경하기
+    private final TempProblemRepository tempProblemRepository;
 
     public int judge(JudgeRequest judgeRequest) {
-        // TODO: 문제 번호로 문제 조회하기
-        Problem problem = new Problem(List.of(
-                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2, 4, 6, 8, 10]"),
-                new Hiddencase(List.of("4", "[1,2,3,4]"), "[2,4,6,8]"),
-                new Hiddencase(List.of("5", "[1,2,3,4,5]"), "[2,4,6,8,10]")
-        ), List.of("int", "int[]"), "int[]");
+        Problem problem = tempProblemRepository.findByProblemNo(judgeRequest.getProblemNo())
+                .orElseThrow(() -> new IllegalArgumentException("없는 문제 번호입니다."));
 
         String route = UUID.randomUUID() + "/";
         createFolder(route);

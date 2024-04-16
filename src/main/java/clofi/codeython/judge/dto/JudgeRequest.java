@@ -7,4 +7,5 @@ import lombok.Getter;
 public class JudgeRequest {
     private Language language;
     private String code;
+    private Long problemNo;
 }
