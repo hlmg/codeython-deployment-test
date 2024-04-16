@@ -1,6 +1,6 @@
 package clofi.codeython.problem.controller;
 
-import clofi.codeython.problem.domain.request.AddProblemRequest;
+import clofi.codeython.problem.domain.request.CreateProblemRequest;
 import clofi.codeython.problem.service.ProblemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +16,9 @@ public class ProblemController {
     private final ProblemService problemService;
 
     @PostMapping("/api/problems")
-    public ResponseEntity<Long> addProblem(@RequestBody AddProblemRequest addProblemRequest) {
-
+    public ResponseEntity<Long> createProblem(@RequestBody CreateProblemRequest createProblemRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(problemService.addProblem(addProblemRequest));
+                .body(problemService.createProblem(createProblemRequest));
     }
 
 }

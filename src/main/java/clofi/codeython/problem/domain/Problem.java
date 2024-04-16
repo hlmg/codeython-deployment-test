@@ -1,5 +1,6 @@
 package clofi.codeython.problem.domain;
 
+import clofi.codeython.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,10 +8,11 @@ import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
 
+
 @Entity @Getter
 @DynamicInsert
 @NoArgsConstructor
-public class Problem {
+public class Problem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

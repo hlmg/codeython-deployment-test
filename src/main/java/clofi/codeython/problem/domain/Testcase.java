@@ -12,7 +12,7 @@ public class Testcase {
     @Column(name = "testcase_no", nullable = false)
     private Long testcaseNo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_no", nullable = false)
     private Problem problemNo;
 

@@ -13,7 +13,7 @@ public class Record {
     @Column(name = "record_no", nullable = false)
     private Long recordNo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no", nullable = false)
     private Member userNo;
 

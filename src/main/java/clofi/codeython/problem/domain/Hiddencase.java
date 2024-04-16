@@ -12,7 +12,7 @@ public class Hiddencase {
     @Column(name = "hiddencase_no", nullable = false)
     private Long hiddencaseNo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_no", nullable = false)
     private Problem problemNo;
 
