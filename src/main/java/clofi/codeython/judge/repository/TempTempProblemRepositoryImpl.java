@@ -14,10 +14,10 @@ public class TempTempProblemRepositoryImpl implements TempProblemRepository {
         put(1L, new Problem(1L, List.of(
                 new Hiddencase(List.of("2", "[1,2]"), "[2, 4]"),
                 new Hiddencase(List.of("3", "[1,2,3]"), "[2,4,6]")
-        ), List.of("int", "int[]"), "int[]"));
+        ), List.of("int", "int[]")));
         put(2L, new Problem(2L, List.of(
                 new Hiddencase(List.of("[1,2]", "[A, B]"), "[1A, 2B]")
-        ), List.of("int[]", "String[]"), "String[]"));
+        ), List.of("int[]", "String[]")));
     }};
 
     @Override

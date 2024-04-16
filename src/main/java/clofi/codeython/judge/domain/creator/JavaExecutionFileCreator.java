@@ -18,7 +18,6 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
 
     @Override
     public void create(List<String> inputTypes, String code, String route) {
-        // TODO: Main 코드 문제별로 고정이기 때문에 repository에 저장하고 재사용하게 변경
         createMainFile(route, inputTypes);
         createSolutionFile(route, code);
         compile(route);
@@ -43,9 +42,7 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
         sb.append("System.out.print(mapper.writeValueAsString(s.solution(");
 
         for (int i = 0; i < inputTypes.size(); i++) {
-            sb.append(String.format("""
-                            mapper.readValue(args[%d], %s.class)""",
-                    i, inputTypes.get(i)));
+            sb.append(String.format("mapper.readValue(args[%d], %s.class)", i, inputTypes.get(i)));
 
             if (i != inputTypes.size() - 1) {
                 sb.append(",");

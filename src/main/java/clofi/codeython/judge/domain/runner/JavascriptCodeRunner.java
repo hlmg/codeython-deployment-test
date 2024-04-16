@@ -5,17 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@Component
-public class JavaCodeRunner implements CodeRunner {
+//@Component
+public class JavascriptCodeRunner implements CodeRunner {
 
     @Override
     public String run(String route, List<String> inputs) {
         ArrayList<String> command = new ArrayList<>(
-                List.of("java", "-cp", String.format("./libs/*:./%s", route), "Main"));
+                List.of("node", route + "solution.js"));
 
         command.addAll(inputs);
 
@@ -46,4 +44,5 @@ public class JavaCodeRunner implements CodeRunner {
 
         return outputMessage.toString();
     }
+
 }

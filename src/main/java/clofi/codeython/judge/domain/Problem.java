@@ -9,12 +9,10 @@ public class Problem {
     public Long problemNo;
     public List<Hiddencase> hiddencases;
     public List<String> inputTypes;
-    public String outputType;
 
-    public Problem(Long problemNo, List<Hiddencase> hiddencases, List<String> inputTypes, String outputType) {
+    public Problem(Long problemNo, List<Hiddencase> hiddencases, List<String> inputTypes) {
         this.problemNo = problemNo;
         this.hiddencases = hiddencases;
         this.inputTypes = inputTypes;
-        this.outputType = outputType;
     }
 }

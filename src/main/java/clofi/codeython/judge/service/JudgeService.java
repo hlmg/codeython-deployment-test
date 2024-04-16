@@ -35,7 +35,7 @@ public class JudgeService {
         // TODO: 언어에 맞는 구현체 사용
         try {
             executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
-            return resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
+            return resultCalculator.calculate(problem.hiddencases, route);
         } finally {
             cleanup(route);
         }
