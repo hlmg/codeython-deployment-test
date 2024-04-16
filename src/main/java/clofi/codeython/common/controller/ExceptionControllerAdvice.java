@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import clofi.codeython.common.domain.dto.ExceptionResult;
 import jakarta.persistence.EntityNotFoundException;
@@ -50,7 +51,8 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 		String submessage = message.substring(message.indexOf("problem: ") + 9);
 		ExceptionResult exceptionResult = new ExceptionResult(submessage);
 		return ResponseEntity.badRequest().body(exceptionResult);
-    
+	}
+
 	@ResponseStatus(NOT_FOUND)
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ExceptionResult entityNotFoundException(EntityNotFoundException exception) {
