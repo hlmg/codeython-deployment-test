@@ -23,20 +23,24 @@ public class JavaCodeRunner implements CodeRunner {
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder outputMessage = new StringBuilder();
         try {
             Process process = processBuilder.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-                builder.append(System.lineSeparator());
+            while ((line = outputReader.readLine()) != null) {
+                outputMessage.append(line);
+                outputMessage.append(System.lineSeparator());
+            }
+            while ((line = errorReader.readLine()) != null) {
+                outputMessage.append(line);
+                outputMessage.append(System.lineSeparator());
             }
         } catch (IOException e) {
-            throw new RuntimeException("프로세스 실행에 실패했습니다.", e);
+            throw new IllegalStateException(e);
         }
 
-        return builder.toString();
+        return outputMessage.toString();
     }
 }

@@ -33,10 +33,12 @@ public class JudgeService {
         String route = UUID.randomUUID() + "/";
         createFolder(route);
         // TODO: 언어에 맞는 구현체 사용
-        executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
-        int result = resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
-        cleanup(route);
-        return result;
+        try {
+            executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
+            return resultCalculator.calculate(problem.hiddencases, route, problem.outputType);
+        } finally {
+            cleanup(route);
+        }
     }
 
     private void createFolder(String route) {

@@ -1,8 +1,11 @@
 package clofi.codeython.judge.domain.creator;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +35,9 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
                 import com.fasterxml.jackson.databind.ObjectMapper;
 
                 public class Main {
-                    public static void main(String[] args) {
+                    public static void main(String[] args) throws Exception {
                         Solution s = new Solution();
                         ObjectMapper mapper = new ObjectMapper();
-                        try {
                 """);
 
         sb.append("System.out.print(mapper.writeValueAsString(s.solution(");
@@ -50,12 +52,7 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
             }
         }
 
-        sb.append("""
-                )));
-                } catch (Exception e) {
-                    System.out.print(e);
-                }
-                }}""");
+        sb.append(")));}}");
         return sb.toString();
     }
 
@@ -63,7 +60,7 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
         try (PrintWriter printWriter = new PrintWriter(new FileWriter(route + fileName))) {
             printWriter.print(content);
         } catch (IOException e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException(e);
         }
     }
 
@@ -72,21 +69,25 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
     }
 
     private void compile(String route) {
-        log.info("Compiling... route={}", route);
-
         ArrayList<String> commands = new ArrayList<>(
                 List.of("javac", "-cp", String.format("./libs/*:./%s", route), String.format("%sMain.java", route)));
-        ProcessBuilder pb = new ProcessBuilder(commands);
-        File error = new File(route + "error.txt");
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
-        pb.redirectError(error);
+        StringBuilder errorMessage = new StringBuilder();
         try {
-            Process process = pb.start();
+            Process process = processBuilder.start();
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             process.waitFor();
+            String line;
+            while ((line = errorReader.readLine()) != null) {
+                errorMessage.append(line);
+                errorMessage.append(System.lineSeparator());
+            }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
-
-        log.info("Successfully Compiled");
+        if (!errorMessage.isEmpty()) {
+            throw new IllegalArgumentException(errorMessage.toString());
+        }
     }
 }
