@@ -1,7 +1,12 @@
-FROM gradle:8.5-jdk AS build
+FROM gradle:latest AS build
 WORKDIR /home/gradle/project
 COPY . .
-RUN mkdir -p /root/.gradle && echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
+# Gradle Wrapper 설치
+RUN gradle wrapper --gradle-version=8.5
+# 프록시 설정
+RUN mkdir -p /root/.gradle && \
+    echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
+# Gradle Wrapper를 통한 빌드
 RUN chmod +x ./gradlew && ./gradlew clean build
 
 FROM openjdk:21-slim
