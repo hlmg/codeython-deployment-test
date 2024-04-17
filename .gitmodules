@@ -1,0 +1,4 @@
+[submodule "CodeyThon-server-private"]
+	path = CodeyThon-server-private
+	url = https://github.com/Clo-fi/CodeyThon-server-private.git
+	branch = main
