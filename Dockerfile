@@ -1,4 +1,4 @@
-FROM gradle:jdk-21 AS build
+FROM gradle:jdk21 AS build
 WORKDIR /home/gradle/project
 COPY . .
 RUN gradle wrapper --gradle-version=8.5
