@@ -7,5 +7,5 @@ RUN chmod +x ./gradlew && ./gradlew clean build
 
 FROM openjdk:21-slim
 WORKDIR /app
-COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
+COPY --from=build /home/gradle/project/build/libs/codeython-0.0.1-SNAPSHOT.jar app.jar
 CMD ["java", "-jar", "app.jar", "--spring.config.location=/home/gradle/project/application-prod.yaml"]
