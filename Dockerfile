@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS build
+FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu AS build
 WORKDIR /home/gradle/project
 COPY . .
 RUN mkdir -p /root/.gradle && \
