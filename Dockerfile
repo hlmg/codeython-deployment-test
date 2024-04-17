@@ -1,4 +1,4 @@
-FROM gradle:8.5-jdk11 AS build
+FROM gradle:8.5-jdk21 AS build
 WORKDIR /home/gradle/project
 COPY . .
 RUN chmod +x ./gradlew && ./gradlew clean build
