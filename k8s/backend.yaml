@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_76a65f41a963
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_3bcf8ca1e5a8
           env:
             - name: DB_HOST
               valueFrom:
