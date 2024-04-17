@@ -9,5 +9,6 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
     Optional<Problem> findByProblemNo(Long problemNo);
 
-    Optional<Problem> findByTitle(String title);
+    boolean existsByTitle(String title);
+
 }

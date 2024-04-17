@@ -9,11 +9,18 @@ Content-Type: application/json
   "limitTime": 60,
   "difficulty": 1,
   "baseCodes" : [{
-    "language": "matlab",
+    "language": "PYTHON",
     "code": "x=1; y=\"hello world!\"; figure;plot(x,y);"
   },{
     "language": "JAVA",
     "code": "public class Main{public static void main(String[] args){System.out.println(\"Hello World!\");}}"
   }
   ]
+}
+
+### 문제조회
+GET localhost:8080/api/problems
+Content-Type: application/json
+
+{
 }

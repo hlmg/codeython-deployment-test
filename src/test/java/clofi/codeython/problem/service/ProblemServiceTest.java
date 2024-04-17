@@ -1,5 +1,6 @@
 package clofi.codeython.problem.service;
 
+import clofi.codeython.problem.controller.response.AllProblemResponse;
 import clofi.codeython.problem.domain.Language;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Problem;
@@ -7,6 +8,8 @@ import clofi.codeython.problem.domain.request.BaseCodeRequest;
 import clofi.codeython.problem.domain.request.CreateProblemRequest;
 import clofi.codeython.problem.repository.LanguageRepository;
 import clofi.codeython.problem.repository.ProblemRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,7 @@ class ProblemServiceTest {
     private ProblemRepository problemRepository;
     @Autowired
     private LanguageRepository languageRepository;
+
 
     @AfterEach
     void afterEach(){
@@ -130,11 +134,80 @@ class ProblemServiceTest {
 
     }
 
+
+    @DisplayName("문제 목록 조회")
+    @Test
+    void getAllProblemTest(){
+        //given
+        List<BaseCodeRequest> baseCodeRequests1 = new ArrayList<>();
+        baseCodeRequests1.add(new BaseCodeRequest(
+                LanguageType.JAVA,
+                """
+                        public class Main{
+                        public static void main(String[] args){
+                        System.out.println("Hello World!");}
+                        }
+                    """));
+        CreateProblemRequest createProblemRequest = getCreateProblemRequest(baseCodeRequests1);
+        Long problemId = problemService.createProblem(createProblemRequest);
+
+        //when
+        List<AllProblemResponse> allProblem = problemService.getAllProblem();
+
+        //then
+        AllProblemResponse problem = allProblem.get(0);
+        Assertions.assertThat(1).isEqualTo(allProblem.size());
+        Assertions.assertThat("where is koreanCow").isEqualTo(problem.title());
+
+        //given
+        List<BaseCodeRequest> baseCodeRequests2 = new ArrayList<>();
+        baseCodeRequests2.add(new BaseCodeRequest(
+                LanguageType.JAVA,
+                """
+                        public class Main{
+                        public static void main(String[] args){
+                        System.out.println("Hello World!");}
+                        }
+                    """));
+        CreateProblemRequest createProblemRequest2 = getCreateProblemRequest2(baseCodeRequests2);
+        Long problemId2 = problemService.createProblem(createProblemRequest2);
+
+        //when
+        List<AllProblemResponse> allProblem2 = problemService.getAllProblem();
+
+        //then
+        Assertions.assertThat(2).isEqualTo(allProblem2.size());
+
+    }
+
+    @DisplayName("문제조회 - 문제가 없을 경우")
+    @Test
+    void getAllProblemWithNotTest() {
+        //given
+        //when
+        //then
+        assertThatThrownBy(() ->
+                problemService.getAllProblem())
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("등록된 문제가 없습니다.");
+    }
+
     private static CreateProblemRequest getCreateProblemRequest(List<BaseCodeRequest> baseCodeRequests) {
         return new CreateProblemRequest(
                 "where is koreanCow",
                 "koreanCow is delicious",
                 "Never eat dog",
+                60,
+                1,
+                baseCodeRequests
+        );
+    }
+
+    private static CreateProblemRequest getCreateProblemRequest2(List<BaseCodeRequest> baseCodeRequests) {
+        return new CreateProblemRequest(
+                "where is koreanCow2",
+                "koreanCow is delicious2",
+                "Never eat dog2",
                 60,
                 1,
                 baseCodeRequests
