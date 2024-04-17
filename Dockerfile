@@ -1,7 +1,6 @@
 FROM gradle:jdk21 AS build
 WORKDIR /home/gradle/project
 COPY . .
-RUN gradle wrapper --gradle-version=8.5
 RUN mkdir -p /root/.gradle && \
     echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
 RUN chmod +x ./gradlew && ./gradlew clean build
