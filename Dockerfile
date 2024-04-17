@@ -1,4 +1,4 @@
-FROM gradle:8.5-jdk21 AS build
+FROM gradle:8.5-jdk AS build
 WORKDIR /home/gradle/project
 COPY . .
 RUN mkdir -p /root/.gradle && echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
