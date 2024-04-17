@@ -1,7 +1,7 @@
 FROM gradle:8.5-jdk21 AS build
 WORKDIR /home/gradle/project
 COPY . .
-RUN chmod +x ./gradlew && ./gradlew clean build
+RUN chmod +x ./gradlew && ./gradlew wrapper --gradle-version=8.5 && ./gradlew clean build
 
 FROM openjdk:21-slim
 WORKDIR /app
