@@ -4,11 +4,13 @@ import clofi.codeython.problem.domain.Language;
 import clofi.codeython.problem.domain.Problem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface LanguageRepository extends JpaRepository<Language, Long> {
 
     Language findByLanguageNo(Long LanguageNo);
 
-    Language findByProblem(Problem problem);
+    List<Language> findByProblem(Problem problem);
 
 
 }

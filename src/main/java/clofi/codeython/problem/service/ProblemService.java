@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import clofi.codeython.problem.controller.response.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import clofi.codeython.member.domain.Member;
 import clofi.codeython.member.repository.MemberRepository;
-import clofi.codeython.problem.controller.response.AllProblemResponse;
-import clofi.codeython.problem.controller.response.RecordResponse;
 import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.domain.Record;
 import clofi.codeython.problem.domain.request.BaseCodeRequest;
@@ -47,7 +46,6 @@ public class ProblemService {
         for (HiddencaseRequest hiddencase : createProblemRequest.getHiddencase()) {
             hiddencaseRepository.save(createProblemRequest.toHiddencase(problem, hiddencase.getInputCase(), hiddencase.getOutputCase()));
         }
-        // 에러가 뭐가 있을까..
 
         return problem.getProblemNo();
     }
@@ -66,6 +64,29 @@ public class ProblemService {
                     .orElseGet(() -> AllProblemResponse.of(problem, 0, false));
         }).collect(Collectors.toList());
 
+    }
+
+    public GetProblemResponse getProblem(Long problemNo) {
+
+        if (problemRepository.findByProblemNo(problemNo) == null){
+            throw new EntityNotFoundException("등록된 문제가 없습니다.");
+        }
+        Problem problem = problemRepository.findByProblemNo(problemNo);
+
+        List<BaseCodeResponse> baseCodes = languageRepository.findByProblem(problem)
+                .stream()
+                .map(bc -> new BaseCodeResponse(bc.getLanguage(),bc.getBaseCode()))
+                .collect(Collectors.toList());
+
+        List<TestcaseResponse> testcases = testcaseRepository.findByProblem(problem)
+                .stream()
+                .map(tc -> new TestcaseResponse(tc.getInput(),tc.getOutput(),tc.getDescription()))
+                .collect(Collectors.toList());
+
+        return GetProblemResponse.of(
+                problem,
+                baseCodes,
+                testcases);
     }
 
     public List<RecordResponse> getRecord(String userName) {

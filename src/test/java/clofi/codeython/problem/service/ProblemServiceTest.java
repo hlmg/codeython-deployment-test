@@ -3,6 +3,7 @@ package clofi.codeython.problem.service;
 import clofi.codeython.member.domain.Member;
 import clofi.codeython.member.repository.MemberRepository;
 import clofi.codeython.problem.controller.response.AllProblemResponse;
+import clofi.codeython.problem.controller.response.GetProblemResponse;
 import clofi.codeython.problem.controller.response.RecordResponse;
 import clofi.codeython.problem.domain.Record;
 import clofi.codeython.problem.domain.*;
@@ -93,7 +94,7 @@ class ProblemServiceTest {
         assertThat(problem.getDifficulty()).isEqualTo(1);
 
 
-        Language language = languageRepository.findByProblem(problem);
+        Language language = languageRepository.findByProblem(problem).get(0);
             assertThat(language.getLanguage()).isEqualTo(LanguageType.JAVA);
             assertThat(language.getBaseCode()).isEqualTo(
             """
@@ -104,7 +105,7 @@ class ProblemServiceTest {
                     """);
 
 
-        Testcase testcase = testcaseRepository.findByProblem(problem);
+        Testcase testcase = testcaseRepository.findByProblem(problem).get(0);
         assertThat(testcase.getInput()).containsExactly("a, b","3, 4", "5, 6");
         assertThat(testcase.getOutput()).isEqualTo("3");
         assertThat(testcase.getDescription()).isEqualTo("a");
@@ -268,6 +269,43 @@ class ProblemServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("등록된 문제가 없습니다.");
     }
+
+    @DisplayName("문제 상세 조회")
+    @Test
+    void getProblemTest(){
+        //given
+        List<BaseCodeRequest> baseCodeRequests1 = new ArrayList<>();
+        baseCodeRequests1.add(new BaseCodeRequest(
+                LanguageType.JAVA,
+                """
+                        public class Main{
+                        public static void main(String[] args){
+                        System.out.println("Hello World!");}
+                        }
+                    """));
+        List<TestcaseRequest> testcaseRequests1 = new ArrayList<>();
+        testcaseRequests1.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
+
+        List<HiddencaseRequest> hiddencaseRequests1 = new ArrayList<>();
+        hiddencaseRequests1.add(new HiddencaseRequest(
+                List.of("A, B","10, 20", "50, 60"),
+                "10"
+        ));
+        CreateProblemRequest createProblemRequest = getCreateProblemRequest(
+                baseCodeRequests1,testcaseRequests1,hiddencaseRequests1);
+        Long problemId = problemService.createProblem(createProblemRequest);
+
+        //when
+        GetProblemResponse problem = problemService.getProblem(problemId);
+
+        //then
+        Assertions.assertThat("where is koreanCow").isEqualTo(problem.title());
+    }
+
 
     private static CreateProblemRequest getCreateProblemRequest(
             List<BaseCodeRequest> baseCodeRequests,

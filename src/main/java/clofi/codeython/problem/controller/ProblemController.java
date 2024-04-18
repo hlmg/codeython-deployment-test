@@ -2,13 +2,11 @@ package clofi.codeython.problem.controller;
 
 import java.util.List;
 
+import clofi.codeython.problem.controller.response.GetProblemResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import clofi.codeython.member.service.dto.CustomMemberDetails;
 import clofi.codeython.problem.controller.response.AllProblemResponse;
@@ -35,6 +33,12 @@ public class ProblemController {
 
 		return ResponseEntity.ok(problemService.getAllProblem());
 	}
+
+	@GetMapping("/api/problems/{problemId}")
+	public ResponseEntity<GetProblemResponse> getProblem(@PathVariable("problemId") Long problemNo) {
+		return ResponseEntity.ok(problemService.getProblem(problemNo));
+	}
+
 
 	@GetMapping("/api/recent-records")
 	public ResponseEntity<List<RecordResponse>> getRecord(
