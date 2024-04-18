@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class JavascriptCodeRunner implements CodeRunner {
 
     @Override

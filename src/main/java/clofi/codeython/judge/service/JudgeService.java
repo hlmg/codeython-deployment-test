@@ -5,10 +5,12 @@ import clofi.codeython.judge.domain.ResultCalculator;
 import clofi.codeython.judge.domain.creator.ExecutionFileCreator;
 import clofi.codeython.judge.dto.JudgeRequest;
 import clofi.codeython.judge.repository.TempProblemRepository;
+import clofi.codeython.problem.domain.LanguageType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service
 public class JudgeService {
-    private final ExecutionFileCreator executionFileCreator;
+    private final Map<String, ExecutionFileCreator> executionFileCreatorMap;
     private final ResultCalculator resultCalculator;
     // TODO: 실제 문제 저장소로 변경하기
     private final TempProblemRepository tempProblemRepository;
@@ -32,10 +34,13 @@ public class JudgeService {
 
         String route = UUID.randomUUID() + "/";
         createFolder(route);
-        // TODO: 언어에 맞는 구현체 사용
         try {
+            ExecutionFileCreator executionFileCreator = executionFileCreatorMap
+                    .get(LanguageType.getCreatorName(judgeRequest.getLanguage()));
+
             executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
-            return resultCalculator.calculate(problem.hiddencases, route);
+
+            return resultCalculator.calculate(problem.hiddencases, route, judgeRequest.getLanguage());
         } finally {
             cleanup(route);
         }

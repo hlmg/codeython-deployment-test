@@ -1,9 +1,11 @@
 package clofi.codeython.judge.domain;
 
 import clofi.codeython.judge.domain.runner.CodeRunner;
+import clofi.codeython.problem.domain.LanguageType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,9 +14,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class ResultCalculator {
-    private final CodeRunner codeRunner;
+    private final Map<String, CodeRunner> codeRunnerMap;
 
-    public int calculate(List<Hiddencase> hiddencases, String route) {
+    public int calculate(List<Hiddencase> hiddencases, String route, String language) {
+        CodeRunner codeRunner = codeRunnerMap.get(LanguageType.getCodeRunnerName(language));
         int total = hiddencases.size();
         int success = 0;
         for (Hiddencase hiddencase : hiddencases) {
