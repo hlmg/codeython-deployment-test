@@ -11,7 +11,7 @@ import clofi.codeython.problem.domain.Record;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
 
-	Optional<Record> findByProblemNo(Problem problemNo);
+	Optional<Record> findByProblem(Problem problem);
 
-	List<Record> findAllByUserNoOrderByUpdatedAtDesc(Member member);
+	List<Record> findAllByMemberOrderByUpdatedAtDesc(Member member);
 }
