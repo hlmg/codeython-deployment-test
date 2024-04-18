@@ -36,7 +36,6 @@ public class MemberController {
 		return ResponseEntity.ok(memberService.getMember(username));
 	}
 
-	//TODO: pathVar 나중에 토큰으로 교체
 	@PatchMapping("/api/users")
 	public ResponseEntity<Long> update(
 		@AuthenticationPrincipal CustomMemberDetails userDetails,

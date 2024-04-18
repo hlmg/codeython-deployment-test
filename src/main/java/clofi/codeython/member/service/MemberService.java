@@ -13,6 +13,7 @@ import clofi.codeython.member.domain.request.CreateMemberRequest;
 import clofi.codeython.member.domain.request.UpdateMemberRequest;
 import clofi.codeython.member.repository.MemberRepository;
 import clofi.codeython.member.service.dto.CustomMemberDetails;
+import clofi.codeython.problem.repository.RecordRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService implements UserDetailsService {
 	private final MemberRepository memberRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final RecordRepository recordRepository;
 
 	public Long signUp(CreateMemberRequest createMemberRequest) {
 		if (memberRepository.existsByNickname(createMemberRequest.getNickname())) {
