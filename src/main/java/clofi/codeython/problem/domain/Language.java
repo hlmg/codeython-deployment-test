@@ -15,7 +15,7 @@ public class Language {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_no", nullable = false)
-    private Problem problemNo;
+    private Problem problem;
 
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -24,8 +24,8 @@ public class Language {
     @Column(name = "base_code", nullable = false, columnDefinition = "TEXT")
     private String baseCode;
 
-    public Language(Problem problemNo, LanguageType language, String baseCode) {
-        this.problemNo = problemNo;
+    public Language(Problem problem, LanguageType language, String baseCode) {
+        this.problem = problem;
         this.language = language;
         this.baseCode = baseCode;
     }
