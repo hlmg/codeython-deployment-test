@@ -1,7 +1,9 @@
 package clofi.codeython.judge.domain;
 
 import clofi.codeython.judge.domain.runner.CodeRunner;
+import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.LanguageType;
+import clofi.codeython.problem.domain.Testcase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -16,16 +18,25 @@ import org.springframework.stereotype.Component;
 public class ResultCalculator {
     private final Map<String, CodeRunner> codeRunnerMap;
 
-    public int calculate(List<Hiddencase> hiddencases, String route, String language) {
+    public int calculate(String route, String language, List<Testcase> testcases, List<Hiddencase> hiddencases) {
         CodeRunner codeRunner = codeRunnerMap.get(LanguageType.getCodeRunnerName(language));
         int total = hiddencases.size();
         int success = 0;
+
+        for (Testcase testcase : testcases) {
+            String result = codeRunner.run(route, testcase.getInput());
+            if (isMatch(result, testcase.getOutput())) {
+                success++;
+            }
+        }
+
         for (Hiddencase hiddencase : hiddencases) {
-            String result = codeRunner.run(route, hiddencase.getInputs());
+            String result = codeRunner.run(route, hiddencase.getInput());
             if (isMatch(result, hiddencase.getOutput())) {
                 success++;
             }
         }
+
         return success * 100 / total;
     }
 

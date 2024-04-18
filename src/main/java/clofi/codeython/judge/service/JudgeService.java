@@ -1,15 +1,20 @@
 package clofi.codeython.judge.service;
 
-import clofi.codeython.judge.domain.Problem;
 import clofi.codeython.judge.domain.ResultCalculator;
 import clofi.codeython.judge.domain.creator.ExecutionFileCreator;
 import clofi.codeython.judge.dto.JudgeRequest;
-import clofi.codeython.judge.repository.TempProblemRepository;
+import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.LanguageType;
+import clofi.codeython.problem.domain.Problem;
+import clofi.codeython.problem.domain.Testcase;
+import clofi.codeython.problem.repository.HiddencaseRepository;
+import clofi.codeython.problem.repository.ProblemRepository;
+import clofi.codeython.problem.repository.TestcaseRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -25,11 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class JudgeService {
     private final Map<String, ExecutionFileCreator> executionFileCreatorMap;
     private final ResultCalculator resultCalculator;
-    // TODO: 실제 문제 저장소로 변경하기
-    private final TempProblemRepository tempProblemRepository;
+    private final ProblemRepository problemRepository;
+    private final TestcaseRepository testcaseRepository;
+    private final HiddencaseRepository hiddencaseRepository;
 
     public int judge(JudgeRequest judgeRequest, Long problemNo) {
-        Problem problem = tempProblemRepository.findByProblemNo(problemNo)
+        Problem problem = problemRepository.findById(problemNo)
                 .orElseThrow(() -> new IllegalArgumentException("없는 문제 번호입니다."));
 
         String route = UUID.randomUUID() + "/";
@@ -38,9 +44,12 @@ public class JudgeService {
             ExecutionFileCreator executionFileCreator = executionFileCreatorMap
                     .get(LanguageType.getCreatorName(judgeRequest.getLanguage()));
 
-            executionFileCreator.create(problem.inputTypes, judgeRequest.getCode(), route);
+            executionFileCreator.create(problem.getType(), judgeRequest.getCode(), route);
 
-            return resultCalculator.calculate(problem.hiddencases, route, judgeRequest.getLanguage());
+            List<Testcase> testcases = testcaseRepository.findAllByProblemProblemNo(problemNo);
+            List<Hiddencase> hiddencases = hiddencaseRepository.findAllByProblemProblemNo(problemNo);
+
+            return resultCalculator.calculate(route, judgeRequest.getLanguage(), testcases, hiddencases);
         } finally {
             cleanup(route);
         }
