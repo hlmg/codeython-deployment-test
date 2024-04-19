@@ -1,4 +1,4 @@
-package clofi.codeython.judge.domain.runner;
+package clofi.codeython.problem.judge.domain.runner;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,12 +8,12 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JavaCodeRunner implements CodeRunner {
+public class JavascriptCodeRunner implements CodeRunner {
 
     @Override
     public String run(String route, List<String> inputs) {
         ArrayList<String> command = new ArrayList<>(
-                List.of("java", "-cp", String.format("./libs/*:./%s", route), "Main"));
+                List.of("node", route + "solution.js"));
 
         command.addAll(inputs);
 
@@ -44,4 +44,5 @@ public class JavaCodeRunner implements CodeRunner {
 
         return outputMessage.toString();
     }
+
 }

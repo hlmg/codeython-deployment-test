@@ -1,4 +1,4 @@
-package clofi.codeython.judge.domain.creator;
+package clofi.codeython.problem.judge.domain.creator;
 
 import java.io.FileWriter;
 import java.io.IOException;

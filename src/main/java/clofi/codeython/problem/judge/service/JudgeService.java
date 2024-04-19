@@ -1,8 +1,8 @@
-package clofi.codeython.judge.service;
+package clofi.codeython.problem.judge.service;
 
-import clofi.codeython.judge.domain.ResultCalculator;
-import clofi.codeython.judge.domain.creator.ExecutionFileCreator;
-import clofi.codeython.judge.dto.JudgeRequest;
+import clofi.codeython.problem.judge.domain.ResultCalculator;
+import clofi.codeython.problem.judge.domain.creator.ExecutionFileCreator;
+import clofi.codeython.problem.judge.dto.JudgeRequest;
 import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Problem;

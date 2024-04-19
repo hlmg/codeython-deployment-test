@@ -1,8 +1,8 @@
-package clofi.codeython.judge.controller;
+package clofi.codeython.problem.judge.controller;
 
-import clofi.codeython.judge.dto.JudgeRequest;
-import clofi.codeython.judge.dto.JudgeResponse;
-import clofi.codeython.judge.service.JudgeService;
+import clofi.codeython.problem.judge.dto.JudgeRequest;
+import clofi.codeython.problem.judge.dto.JudgeResponse;
+import clofi.codeython.problem.judge.service.JudgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

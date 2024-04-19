@@ -1,4 +1,4 @@
-package clofi.codeython.judge.dto;
+package clofi.codeython.problem.judge.dto;
 
 import lombok.Getter;
 

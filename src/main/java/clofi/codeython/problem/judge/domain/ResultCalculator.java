@@ -1,6 +1,6 @@
-package clofi.codeython.judge.domain;
+package clofi.codeython.problem.judge.domain;
 
-import clofi.codeython.judge.domain.runner.CodeRunner;
+import clofi.codeython.problem.judge.domain.runner.CodeRunner;
 import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Testcase;

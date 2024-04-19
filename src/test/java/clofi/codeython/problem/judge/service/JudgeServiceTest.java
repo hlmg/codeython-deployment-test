@@ -1,9 +1,9 @@
-package clofi.codeython.judge.service;
+package clofi.codeython.problem.judge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import clofi.codeython.judge.dto.JudgeRequest;
+import clofi.codeython.problem.judge.dto.JudgeRequest;
 import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.repository.HiddencaseRepository;

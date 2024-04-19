@@ -1,4 +1,4 @@
-package clofi.codeython.judge.domain.runner;
+package clofi.codeython.problem.judge.domain.runner;
 
 import java.util.List;
 
