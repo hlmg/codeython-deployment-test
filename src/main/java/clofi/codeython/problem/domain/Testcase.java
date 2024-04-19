@@ -19,7 +19,7 @@ public class Testcase {
     @JoinColumn(name = "problem_no", nullable = false)
     private Problem problem;
 
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection
     @Column(name = "input", nullable = false, columnDefinition = "TEXT")
     private List<String> input;
 
