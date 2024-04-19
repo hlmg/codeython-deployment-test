@@ -63,7 +63,7 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
 
     private void compile(String route) {
         ArrayList<String> commands = new ArrayList<>(
-                List.of("javac", "-cp", String.format("./libs/*:./%s", route), String.format("%sMain.java", route)));
+                List.of("javac", "-cp", "./libs/*", "-sourcepath", "./" + route, String.format("%sMain.java", route)));
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
         StringBuilder errorMessage = new StringBuilder();
