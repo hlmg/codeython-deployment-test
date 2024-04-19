@@ -3,10 +3,9 @@ package clofi.codeython.problem.judge.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import clofi.codeython.problem.judge.dto.JudgeRequest;
-import clofi.codeython.problem.domain.Hiddencase;
+import clofi.codeython.problem.domain.Testcase;
+import clofi.codeython.problem.judge.dto.SubmitRequest;
 import clofi.codeython.problem.domain.Problem;
-import clofi.codeython.problem.repository.HiddencaseRepository;
 import clofi.codeython.problem.repository.ProblemRepository;
 import clofi.codeython.problem.repository.TestcaseRepository;
 import java.util.List;
@@ -29,9 +28,6 @@ class JudgeServiceTest {
     ProblemRepository problemRepository;
 
     @MockBean
-    HiddencaseRepository hiddencaseRepository;
-
-    @MockBean
     TestcaseRepository testcaseRepository;
 
     @BeforeEach
@@ -39,19 +35,18 @@ class JudgeServiceTest {
         given(problemRepository.findById(Mockito.anyLong())).willReturn(Optional.of(new Problem(
                 "title", "content", null, 1, 1, List.of("int", "int[]")
         )));
-        given(hiddencaseRepository.findAllByProblemProblemNo(Mockito.any())).willReturn(List.of(
-                new Hiddencase(null,
+        given(testcaseRepository.findAllByProblemProblemNo(Mockito.any())).willReturn(List.of(
+                new Testcase(null,
                         List.of("3", "[1, 2, 3]"),
                         "[2,4,6]")
         ));
-        given(testcaseRepository.findAllByProblemProblemNo(Mockito.any())).willReturn(List.of());
     }
 
     @DisplayName("자바 코드로 채점을 진행할 수 있다.")
     @Test
     void javaCodeSubmitTest() {
         // given
-        JudgeRequest judgeRequest = new JudgeRequest("java", """
+        SubmitRequest submitRequest = new SubmitRequest("java", """
                 class Solution {
                     public int[] solution(int N, int[] values) {
                         int[] answer = new int[values.length];
@@ -61,10 +56,10 @@ class JudgeServiceTest {
                         return answer;
                     }
                 }
-                """);
+                """, null);
 
         // when
-        int actual = judgeService.judge(judgeRequest, 1L);
+        int actual = judgeService.submit(submitRequest, 1L);
 
         // then
         assertThat(actual).isEqualTo(100);
@@ -74,14 +69,14 @@ class JudgeServiceTest {
     @Test
     void javascriptCodeSubmitTest() {
         // given
-        JudgeRequest judgeRequest = new JudgeRequest("javascript", """                
+        SubmitRequest submitRequest = new SubmitRequest("javascript", """                
                 function solution(N, values) {
                   return values.map(v => v * 2)
                 }
-                """);
+                """, null);
 
         // when
-        int actual = judgeService.judge(judgeRequest, 1L);
+        int actual = judgeService.submit(submitRequest, 1L);
 
         // then
         assertThat(actual).isEqualTo(100);
@@ -91,15 +86,15 @@ class JudgeServiceTest {
     @Test
     void invalidLanguageSubmitTest() {
         // given
-        JudgeRequest judgeRequest = new JudgeRequest("go", """                
+        SubmitRequest submitRequest = new SubmitRequest("go", """                
                 function solution(N, values) {
                   return values.map(v => v * 2)
                 }
-                """);
+                """, null);
 
         // when & then
         Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> judgeService.judge(judgeRequest, 1L))
+                .isThrownBy(() -> judgeService.submit(submitRequest, 1L))
                 .withMessage("GO(은)는 지원하지 않는 언어 종류입니다.");
     }
 
@@ -107,7 +102,7 @@ class JudgeServiceTest {
     @Test
     void exceptionCodeSubmitTest() {
         // given
-        JudgeRequest judgeRequest = new JudgeRequest("java", """                
+        SubmitRequest submitRequest = new SubmitRequest("java", """                
                 class Solution {
                     public int[] solution(int N, int[] values) {
                         int[] answer = new int[values.length];
@@ -118,10 +113,10 @@ class JudgeServiceTest {
                         return answer;
                     }
                 }
-                """);
+                """, null);
 
         // when & then
         Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> judgeService.judge(judgeRequest, 1L));
+                .isThrownBy(() -> judgeService.submit(submitRequest, 1L));
     }
 }

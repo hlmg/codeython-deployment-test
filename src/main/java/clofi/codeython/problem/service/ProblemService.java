@@ -14,7 +14,6 @@ import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.domain.Record;
 import clofi.codeython.problem.domain.request.BaseCodeRequest;
 import clofi.codeython.problem.domain.request.CreateProblemRequest;
-import clofi.codeython.problem.domain.request.HiddencaseRequest;
 import clofi.codeython.problem.domain.request.TestcaseRequest;
 import clofi.codeython.problem.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class ProblemService {
     private final ProblemRepository problemRepository;
     private final LanguageRepository languageRepository;
-    private final HiddencaseRepository hiddencaseRepository;
     private final TestcaseRepository testcaseRepository;
 	private final RecordRepository recordRepository;
 	private final MemberRepository memberRepository;
@@ -42,9 +40,6 @@ public class ProblemService {
         }
         for (TestcaseRequest testcase : createProblemRequest.getTestcase()) {
             testcaseRepository.save(createProblemRequest.toTestcase(problem, testcase.getInputCase(), testcase.getOutputCase(), testcase.getDescription()));
-        }
-        for (HiddencaseRequest hiddencase : createProblemRequest.getHiddencase()) {
-            hiddencaseRepository.save(createProblemRequest.toHiddencase(problem, hiddencase.getInputCase(), hiddencase.getOutputCase()));
         }
 
         return problem.getProblemNo();
