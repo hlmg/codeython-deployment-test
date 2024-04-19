@@ -35,4 +35,8 @@ public class Testcase {
         this.output = output;
         this.description = description;
     }
+
+    public Testcase(Problem problem, List<String> input, String output) {
+        this(problem, input, output, "");
+    }
 }
