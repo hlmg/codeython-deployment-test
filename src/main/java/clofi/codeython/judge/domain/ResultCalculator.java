@@ -20,7 +20,7 @@ public class ResultCalculator {
 
     public int calculate(String route, String language, List<Testcase> testcases, List<Hiddencase> hiddencases) {
         CodeRunner codeRunner = codeRunnerMap.get(LanguageType.getCodeRunnerName(language));
-        int total = hiddencases.size();
+        int total = hiddencases.size() + testcases.size();
         int success = 0;
 
         for (Testcase testcase : testcases) {
