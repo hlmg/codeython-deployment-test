@@ -50,7 +50,7 @@ public class MemberService implements UserDetailsService {
         Integer exp = member.getExp();
         int level = 1;
         if (exp > 100) {
-            level = exp / 100;
+            level = exp / 100 + 1;
             exp = exp % 100;
         }
         return MemberResponse.of(member, level, exp);
