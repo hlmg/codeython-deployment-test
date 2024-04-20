@@ -1,8 +1,13 @@
-FROM openjdk:21-jdk-alpine
-
+FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu AS build
+FROM node
 WORKDIR /home/gradle/project
-
 COPY . .
-RUN mkdir -p /root/.gradle && echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
+RUN mkdir -p /root/.gradle && \
+    echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
 RUN chmod +x ./gradlew && ./gradlew clean build
-CMD ["java", "-jar", "/home/gradle/project/build/libs/codeython-0.0.1-SNAPSHOT.jar", "--spring.config.location=/home/gradle/project/application-prod.yaml"]
+
+FROM openjdk:21-slim
+WORKDIR /app
+COPY --from=build /home/gradle/project/build/libs/codeython-0.0.1-SNAPSHOT.jar app.jar
+COPY src/main/resources/application-prod.yaml resources/application-prod.yaml
+CMD ["java", "-jar", "app.jar", "--spring.config.location=resources/application-prod.yaml"]
