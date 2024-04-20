@@ -5,12 +5,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 
 public enum LanguageType {
-    JAVA, JAVASCRIPT, PYTHON,
-    /*
-     * Not use. just for test or future implement.
-     */
-    CSharp;
+    JAVA("javaExecutionFileCreator", "javaCodeRunner"),
+    JAVASCRIPT("javascriptExecutionFileCreator", "javascriptCodeRunner");
 
+    private final String creatorName;
+    private final String codeRunnerName;
+
+    LanguageType(String creatorName, String codeRunnerName) {
+        this.creatorName = creatorName;
+        this.codeRunnerName = codeRunnerName;
+    }
 
     @JsonCreator
     public static LanguageType forValue(String value) {
@@ -25,5 +29,15 @@ public enum LanguageType {
     @JsonValue
     public String toValue() {
         return this.name();
+    }
+
+    public static String getCreatorName(String type) {
+        LanguageType languageType = forValue(type.toUpperCase());
+        return languageType.creatorName;
+    }
+
+    public static String getCodeRunnerName(String type) {
+        LanguageType languageType = forValue(type.toUpperCase());
+        return languageType.codeRunnerName;
     }
 }

@@ -1,13 +1,17 @@
 package clofi.codeython.problem.repository;
 
-import clofi.codeython.problem.domain.Problem;
-import clofi.codeython.problem.domain.Record;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import clofi.codeython.member.domain.Member;
+import clofi.codeython.problem.domain.Problem;
+import clofi.codeython.problem.domain.Record;
+
 public interface RecordRepository extends JpaRepository<Record, Long> {
 
-    Optional<Record> findByProblemNo(Problem problemNo);
+	Optional<Record> findByProblem(Problem problem);
+
+	List<Record> findAllByMemberOrderByUpdatedAtDesc(Member member);
 }

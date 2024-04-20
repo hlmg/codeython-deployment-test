@@ -1,13 +1,16 @@
 package clofi.codeython.problem.service;
 
+import clofi.codeython.member.domain.Member;
+import clofi.codeython.member.repository.MemberRepository;
 import clofi.codeython.problem.controller.response.AllProblemResponse;
-import clofi.codeython.problem.domain.Language;
-import clofi.codeython.problem.domain.LanguageType;
-import clofi.codeython.problem.domain.Problem;
+import clofi.codeython.problem.controller.response.GetProblemResponse;
+import clofi.codeython.problem.controller.response.RecordResponse;
+import clofi.codeython.problem.domain.Record;
+import clofi.codeython.problem.domain.*;
 import clofi.codeython.problem.domain.request.BaseCodeRequest;
 import clofi.codeython.problem.domain.request.CreateProblemRequest;
-import clofi.codeython.problem.repository.LanguageRepository;
-import clofi.codeython.problem.repository.ProblemRepository;
+import clofi.codeython.problem.domain.request.TestcaseRequest;
+import clofi.codeython.problem.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -30,13 +33,22 @@ class ProblemServiceTest {
     private ProblemRepository problemRepository;
     @Autowired
     private LanguageRepository languageRepository;
-
+    @Autowired
+    private TestcaseRepository testcaseRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	@Autowired
+	private RecordRepository recordRepository;
 
     @AfterEach
     void afterEach(){
+        testcaseRepository.deleteAllInBatch();
         languageRepository.deleteAllInBatch();
+        recordRepository.deleteAllInBatch();
         problemRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
+
 
     @DisplayName("문제 등록")
     @Test
@@ -51,8 +63,15 @@ class ProblemServiceTest {
                         System.out.println("Hello World!");}
                         }
                     """));
+        List<TestcaseRequest> testcaseRequests = new ArrayList<>();
+        testcaseRequests.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
 
-        CreateProblemRequest createProblemRequest = getCreateProblemRequest(baseCodeRequests);
+        CreateProblemRequest createProblemRequest =
+                getCreateProblemRequest(baseCodeRequests,testcaseRequests);
 
         //when
         Long problemId = problemService.createProblem(createProblemRequest);
@@ -60,13 +79,12 @@ class ProblemServiceTest {
         //then
         assertThat(problem.getTitle()).isEqualTo("where is koreanCow");
         assertThat(problem.getContent()).isEqualTo("koreanCow is delicious");
-        assertThat(problem.getLimitFactor()).isEqualTo("Never eat dog");
+        assertThat(problem.getLimitFactor()).containsExactly("Never eat dog");
         assertThat(problem.getLimitTime()).isEqualTo(60);
         assertThat(problem.getDifficulty()).isEqualTo(1);
 
-        for (BaseCodeRequest baseCodeRequest : baseCodeRequests) {
-            Language language = createProblemRequest.toLanguage(
-                    problem,baseCodeRequest.getLanguage(),baseCodeRequest.getCode());
+
+        Language language = languageRepository.findByProblem(problem).get(0);
             assertThat(language.getLanguage()).isEqualTo(LanguageType.JAVA);
             assertThat(language.getBaseCode()).isEqualTo(
             """
@@ -75,7 +93,12 @@ class ProblemServiceTest {
                         System.out.println("Hello World!");}
                         }
                     """);
-        }
+
+
+        Testcase testcase = testcaseRepository.findByProblem(problem).get(0);
+        assertThat(testcase.getInput()).containsExactly("a, b","3, 4", "5, 6");
+        assertThat(testcase.getOutput()).isEqualTo("3");
+        assertThat(testcase.getDescription()).isEqualTo("a");
     }
 
     @DisplayName("문제 제목 중복")
@@ -85,9 +108,10 @@ class ProblemServiceTest {
         Problem problem = new Problem(
                 "where is koreanCow",
                 "koreanCow is delicious",
-                "Never eat dog",
+                List.of("Never eat dog"),
                 60,
-                1
+                1,
+                List.of("String[][]", "int", "String")
         );
         problemRepository.save(problem);
 
@@ -102,7 +126,15 @@ class ProblemServiceTest {
                         }
                     """));
 
-        CreateProblemRequest createProblemRequest = getCreateProblemRequest(baseCodeRequests);
+        List<TestcaseRequest> testcaseRequests = new ArrayList<>();
+        testcaseRequests.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
+
+        CreateProblemRequest createProblemRequest = getCreateProblemRequest(
+                baseCodeRequests, testcaseRequests);
 
         //then
         assertThatThrownBy(() ->
@@ -148,7 +180,15 @@ class ProblemServiceTest {
                         System.out.println("Hello World!");}
                         }
                     """));
-        CreateProblemRequest createProblemRequest = getCreateProblemRequest(baseCodeRequests1);
+        List<TestcaseRequest> testcaseRequests1 = new ArrayList<>();
+        testcaseRequests1.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
+
+        CreateProblemRequest createProblemRequest = getCreateProblemRequest(
+                baseCodeRequests1,testcaseRequests1);
         Long problemId = problemService.createProblem(createProblemRequest);
 
         //when
@@ -169,7 +209,15 @@ class ProblemServiceTest {
                         System.out.println("Hello World!");}
                         }
                     """));
-        CreateProblemRequest createProblemRequest2 = getCreateProblemRequest2(baseCodeRequests2);
+        List<TestcaseRequest> testcaseRequests2 = new ArrayList<>();
+        testcaseRequests2.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
+
+        CreateProblemRequest createProblemRequest2 = getCreateProblemRequest2(
+                baseCodeRequests2,testcaseRequests2);
         Long problemId2 = problemService.createProblem(createProblemRequest2);
 
         //when
@@ -192,26 +240,91 @@ class ProblemServiceTest {
                 .hasMessage("등록된 문제가 없습니다.");
     }
 
-    private static CreateProblemRequest getCreateProblemRequest(List<BaseCodeRequest> baseCodeRequests) {
+    @DisplayName("문제 상세 조회")
+    @Test
+    void getProblemTest(){
+        //given
+        List<BaseCodeRequest> baseCodeRequests1 = new ArrayList<>();
+        baseCodeRequests1.add(new BaseCodeRequest(
+                LanguageType.JAVA,
+                """
+                        public class Main{
+                        public static void main(String[] args){
+                        System.out.println("Hello World!");}
+                        }
+                    """));
+        List<TestcaseRequest> testcaseRequests1 = new ArrayList<>();
+        testcaseRequests1.add(new TestcaseRequest(
+                List.of("a, b","3, 4", "5, 6"),
+                "3",
+                "a"
+        ));
+
+        CreateProblemRequest createProblemRequest = getCreateProblemRequest(
+                baseCodeRequests1,testcaseRequests1);
+        Long problemId = problemService.createProblem(createProblemRequest);
+
+        //when
+        GetProblemResponse problem = problemService.getProblem(problemId);
+
+        //then
+        Assertions.assertThat("where is koreanCow").isEqualTo(problem.title());
+    }
+
+
+    private static CreateProblemRequest getCreateProblemRequest(
+            List<BaseCodeRequest> baseCodeRequests,
+            List<TestcaseRequest> testcaseRequests
+    ) {
         return new CreateProblemRequest(
                 "where is koreanCow",
                 "koreanCow is delicious",
-                "Never eat dog",
+                List.of("Never eat dog"),
                 60,
                 1,
-                baseCodeRequests
+                List.of("String[][]", "int", "String"),
+                baseCodeRequests,
+                testcaseRequests
         );
     }
 
-    private static CreateProblemRequest getCreateProblemRequest2(List<BaseCodeRequest> baseCodeRequests) {
+    private static CreateProblemRequest getCreateProblemRequest2(
+            List<BaseCodeRequest> baseCodeRequests,
+            List<TestcaseRequest> testcaseRequests
+    ) {
         return new CreateProblemRequest(
                 "where is koreanCow2",
                 "koreanCow is delicious2",
-                "Never eat dog2",
+                List.of("Never eat dog2"),
                 60,
                 1,
-                baseCodeRequests
+                List.of("String[][]", "int", "String"),
+                baseCodeRequests,
+                testcaseRequests
         );
     }
+
+	@DisplayName("최근에 푼 문제의 기록을 갖고 올 수 있다.")
+	@Test
+	void getRecordTest() {
+		//given
+		Member member = new Member("test", "test123", "steet");
+		memberRepository.save(member);
+
+		Problem problem = new Problem("제목", "내용", List.of("제한사항"), 10, 10, List.of("타입"));
+		problemRepository.save(problem);
+
+		Record record = new Record("테스트코드", member, problem, "test언어", 40, null, null);
+		recordRepository.save(record);
+
+		//when
+		List<RecordResponse> records = problemService.getRecord(member.getUsername());
+		//then
+		assertThat(records.getFirst().recordId()).isEqualTo(record.getRecordNo());
+		assertThat(records.getFirst().title()).isEqualTo("제목");
+		assertThat(records.getFirst().accuracy()).isEqualTo(40);
+		assertThat(records.getFirst().grade()).isEqualTo(null);
+
+	}
 
 }

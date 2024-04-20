@@ -27,73 +27,75 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	private final AuthenticationConfiguration authenticationConfiguration;
-	private final JWTUtil jwtUtil;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 
-		return configuration.getAuthenticationManager();
-	}
+        return configuration.getAuthenticationManager();
+    }
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
 
-		return new BCryptPasswordEncoder();
-	}
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		//csrf disable
-		http
-			.csrf((csrf) -> csrf.disable());
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //csrf disable
+        http
+            .csrf((csrf) -> csrf.disable());
 
-		//Form 로그인 방식 disable
-		http
-			.formLogin((form) -> form.disable());
+        //Form 로그인 방식 disable
+        http
+            .formLogin((form) -> form.disable());
 
-		//http basic 인증 방식 disable
-		http
-			.httpBasic((httpBasic) -> httpBasic.disable());
+        //http basic 인증 방식 disable
+        http
+            .httpBasic((httpBasic) -> httpBasic.disable());
 
-		http
-			.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/api/login", "/api/signup", "/h2-console/**").permitAll()
-				.anyRequest().authenticated());
-		http
-			.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+        http
+            .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/login", "/api/signup", "/h2-console/**").permitAll()
+                .anyRequest().authenticated());
+        http
+            .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
-		http
-			.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-				UsernamePasswordAuthenticationFilter.class);
+        http
+            .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+                UsernamePasswordAuthenticationFilter.class);
 
-		http
-			.sessionManagement((session) -> session
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+            .sessionManagement((session) -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		http
-			.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        http
+            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
-		http
-			.cors((corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+        http
+            .cors((corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
 
-				@Override
-				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                @Override
+                public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
-					CorsConfiguration configuration = new CorsConfiguration();
+                    CorsConfiguration configuration = new CorsConfiguration();
 
-					configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-					configuration.setAllowedMethods(Collections.singletonList("*"));
-					configuration.setAllowCredentials(true);
-					configuration.setAllowedHeaders(Collections.singletonList("*"));
-					configuration.setMaxAge(3600L);
+                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOrigins(
+                        Collections.singletonList("https://k1964add55381a.user-app.krampoline.com/"));
+                    configuration.setAllowedMethods(Collections.singletonList("*"));
+                    configuration.setAllowCredentials(true);
+                    configuration.setAllowedHeaders(Collections.singletonList("*"));
+                    configuration.setMaxAge(3600L);
 
-					configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
-					return configuration;
-				}
-			})));
+                    return configuration;
+                }
+            })));
 
-		return http.build();
-	}
+        return http.build();
+    }
 }

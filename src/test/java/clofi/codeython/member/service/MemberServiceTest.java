@@ -43,7 +43,6 @@ class MemberServiceTest {
 
 		assertThat(member.getUsername()).isEqualTo("zeno1030");
 		assertThat(member.getNickname()).isEqualTo("zeno");
-		assertThat(member.getLevel()).isEqualTo(1);
 		assertThat(member.getExp()).isEqualTo(0);
 	}
 
@@ -128,7 +127,5 @@ class MemberServiceTest {
 		//then
 		assertThat(memberInfo.getNickname()).isEqualTo("rnfmal");
 		assertThat(memberInfo.getExp()).isEqualTo(0);
-		assertThat(memberInfo.getLevel()).isEqualTo(1);
-
 	}
 }
