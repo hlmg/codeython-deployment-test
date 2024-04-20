@@ -1,20 +1,15 @@
 package clofi.codeython.problem.judge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.map;
 import static org.mockito.BDDMockito.given;
 
+import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.domain.Testcase;
 import clofi.codeython.problem.judge.dto.ExecutionRequest;
 import clofi.codeython.problem.judge.dto.ExecutionResponse;
 import clofi.codeython.problem.judge.dto.SubmitRequest;
-import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.repository.ProblemRepository;
 import clofi.codeython.problem.repository.TestcaseRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -45,7 +40,7 @@ class JudgeServiceTest {
         given(testcaseRepository.findAllByProblemProblemNo(Mockito.any())).willReturn(List.of(
                 new Testcase(null,
                         List.of("3", "[1, 2, 3]"),
-                        "[2,4,6]")
+                        "[2,4,6]", "description")
         ));
     }
 
@@ -211,5 +206,33 @@ class JudgeServiceTest {
         // when & then
         Assertions.assertThatIllegalArgumentException()
                 .isThrownBy(() -> judgeService.execution(executionRequest, 1L));
+    }
+
+    @DisplayName("description이 없는 테스트 케이스는 실행하지 않는다.")
+    @Test
+    void emptyDescriptionTestcaseTest() {
+        given(testcaseRepository.findAllByProblemProblemNo(Mockito.any())).willReturn(List.of(
+                new Testcase(null,
+                        List.of("3", "[1, 2, 3]"),
+                        "[2,4,6]", null)
+        ));
+        // given
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """                
+                class Solution {
+                    public int[] solution(int N, int[] values) {
+                        int[] answer = new int[values.length];
+                        for (int i = 0; i < N; i++) {
+                            answer[i] = values[i] * 2;
+                        }
+                        return answer;
+                    }
+                }
+                """);
+
+        // when
+        List<ExecutionResponse> execution = judgeService.execution(executionRequest, 1L);
+
+        // then
+        assertThat(execution).isEmpty();
     }
 }

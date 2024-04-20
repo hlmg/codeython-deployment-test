@@ -1,11 +1,10 @@
 package clofi.codeython.problem.judge.domain;
 
-import clofi.codeython.problem.judge.domain.runner.CodeRunner;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Testcase;
+import clofi.codeython.problem.judge.domain.runner.CodeRunner;
 import clofi.codeython.problem.judge.dto.ExecutionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -53,6 +52,9 @@ public class ResultCalculator {
 
         List<ExecutionResponse> list = new ArrayList<>();
         for (Testcase testcase : testcases) {
+            if (testcase.getDescription() == null) {
+                break;
+            }
             String result = codeRunner.run(route, testcase.getInput());
 
             JsonNode actual;
