@@ -1,13 +1,20 @@
 package clofi.codeython.problem.judge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.map;
 import static org.mockito.BDDMockito.given;
 
 import clofi.codeython.problem.domain.Testcase;
+import clofi.codeython.problem.judge.dto.ExecutionRequest;
+import clofi.codeython.problem.judge.dto.ExecutionResponse;
 import clofi.codeython.problem.judge.dto.SubmitRequest;
 import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.repository.ProblemRepository;
 import clofi.codeython.problem.repository.TestcaseRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -98,7 +105,7 @@ class JudgeServiceTest {
                 .withMessage("GO(은)는 지원하지 않는 언어 종류입니다.");
     }
 
-    @DisplayName("코드 실행중 Exception이 발생하면 오류가 발생한다.")
+    @DisplayName("코드 채점 중 Exception이 발생하면 오류가 발생한다.")
     @Test
     void exceptionCodeSubmitTest() {
         // given
@@ -118,5 +125,91 @@ class JudgeServiceTest {
         // when & then
         Assertions.assertThatIllegalArgumentException()
                 .isThrownBy(() -> judgeService.submit(submitRequest, 1L));
+    }
+
+    @DisplayName("자바 코드 실행결과 및 정답 여부를 확인할 수 있다.")
+    @Test
+    void javaCodeExecutionTest() {
+        // given
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """
+                class Solution {
+                    public int[] solution(int N, int[] values) {
+                        int[] answer = new int[values.length];
+                        for (int i = 0; i < N; i++) {
+                            answer[i] = values[i] * 2;
+                        }
+                        return answer;
+                    }
+                }
+                """);
+
+        // when
+        List<ExecutionResponse> actual = judgeService.execution(executionRequest, 1L);
+
+        // then
+        assertThat(actual).containsExactly(new ExecutionResponse(true, "[2,4,6]"));
+    }
+
+    @DisplayName("자바스크립트 코드 실행결과 및 정답 여부를 확인할 수 있다.")
+    @Test
+    void javascriptCodeExecutionTest() {
+        // given
+        ExecutionRequest executionRequest = new ExecutionRequest("javascript", """                
+                function solution(N, values) {
+                  return values.map(v => v * 2)
+                }
+                """);
+
+        // when
+        List<ExecutionResponse> actual = judgeService.execution(executionRequest, 1L);
+
+        // then
+        assertThat(actual).containsExactly(new ExecutionResponse(true, "[2,4,6]"));
+    }
+
+    @DisplayName("실행결과 및 정답 여부를 확인할 수 있다.(오답 코드)")
+    @Test
+    void incorrectOutputCodeTest() {
+        // given
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """
+                class Solution {
+                    public int[] solution(int N, int[] values) {
+                        int[] answer = new int[values.length];
+                        System.out.println("Test message");
+                        for (int i = 0; i < N; i++) {
+                            answer[i] = values[i] * 2;
+                        }
+                        return answer;
+                    }
+                }
+                """);
+
+        // when
+        List<ExecutionResponse> actual = judgeService.execution(executionRequest, 1L);
+
+        // then
+        assertThat(actual).containsExactly(new ExecutionResponse(false, "Test message\n[2,4,6]"));
+    }
+
+    @DisplayName("코드 실행 중 Exception이 발생하면 오류가 발생한다.")
+    @Test
+    void exceptionCodeExecutionTest() {
+        // given
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """                
+                class Solution {
+                    public int[] solution(int N, int[] values) {
+                        int[] answer = new int[values.length];
+                        for (int i = 0; i < N; i++) {
+                            answer[i] = values[i] * 2;
+                        }
+                        throw new IllegalArgumentException("예외 발생");
+                        return answer;
+                    }
+                }
+                """);
+
+        // when & then
+        Assertions.assertThatIllegalArgumentException()
+                .isThrownBy(() -> judgeService.execution(executionRequest, 1L));
     }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,30 +20,24 @@ public class JavascriptCodeRunner implements CodeRunner {
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        StringBuilder outputMessage = new StringBuilder();
-        StringBuilder errorMessage = new StringBuilder();
+        Process process;
         try {
-            Process process = processBuilder.start();
-            BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String line;
-            while ((line = outputReader.readLine()) != null) {
-                outputMessage.append(line);
-                outputMessage.append(System.lineSeparator());
-            }
-            while ((line = errorReader.readLine()) != null) {
-                errorMessage.append(line);
-                errorMessage.append(System.lineSeparator());
-            }
+            process = processBuilder.start();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
 
+        BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+        String outputMessage = outputReader.lines().collect(Collectors.joining(System.lineSeparator()));
+        String errorMessage = errorReader.lines().collect(Collectors.joining(System.lineSeparator()));
+
         if (!errorMessage.isEmpty()) {
-            throw new IllegalArgumentException(errorMessage.toString());
+            throw new IllegalArgumentException(errorMessage);
         }
 
-        return outputMessage.toString();
+        return outputMessage;
     }
 
 }

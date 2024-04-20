@@ -1,8 +1,11 @@
 package clofi.codeython.problem.judge.controller;
 
+import clofi.codeython.problem.judge.dto.ExecutionRequest;
+import clofi.codeython.problem.judge.dto.ExecutionResponse;
 import clofi.codeython.problem.judge.dto.SubmitRequest;
 import clofi.codeython.problem.judge.dto.SubmitResponse;
 import clofi.codeython.problem.judge.service.JudgeService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,4 +23,9 @@ public class JudgeController {
         return new SubmitResponse(judgeService.submit(submitRequest, problemNo), null, null);
     }
 
+    @PostMapping("/api/problems/{problemId}/execution")
+    public List<ExecutionResponse> execution(@RequestBody ExecutionRequest executionRequest,
+                                             @PathVariable("problemId") long problemNo) {
+        return judgeService.execution(executionRequest, problemNo);
+    }
 }
