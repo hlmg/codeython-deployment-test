@@ -10,11 +10,30 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JavaCodeRunner implements CodeRunner {
+    private static final String CLASS_PATH_SEPARATOR = getClassPathSeparatorFromOsName();
+    private static final String JAVA_LIBRARY_PATH = getJavaLibraryPath();
+
+    private static String getClassPathSeparatorFromOsName() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) {
+            return ";";
+        }
+        return ":";
+    }
+
+    private static String getJavaLibraryPath() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win") || os.contains("mac")) {
+            return "./libs/*";
+        }
+        return "/home/gradle/project/libs/*";
+    }
 
     @Override
     public String run(String route, List<String> inputs) {
         ArrayList<String> command = new ArrayList<>(
-                List.of("java", "-cp", String.format("./libs/*:./%s", route), "Main"));
+                List.of("java", "-cp", String.format("%s%s./%s", JAVA_LIBRARY_PATH, CLASS_PATH_SEPARATOR, route),
+                        "Main"));
 
         command.addAll(inputs);
 

@@ -4,8 +4,10 @@ import clofi.codeython.problem.domain.LanguageType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class BaseCodeRequest {
     @NotNull
     @NotBlank(message = "언어는 공백일 수 없습니다.")

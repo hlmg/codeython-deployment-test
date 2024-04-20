@@ -71,7 +71,7 @@ class JudgeServiceTest {
     @Test
     void javascriptCodeSubmitTest() {
         // given
-        SubmitRequest submitRequest = new SubmitRequest("javascript", """                
+        SubmitRequest submitRequest = new SubmitRequest("javascript", """
                 function solution(N, values) {
                   return values.map(v => v * 2)
                 }
@@ -88,7 +88,7 @@ class JudgeServiceTest {
     @Test
     void invalidLanguageSubmitTest() {
         // given
-        SubmitRequest submitRequest = new SubmitRequest("go", """                
+        SubmitRequest submitRequest = new SubmitRequest("go", """
                 function solution(N, values) {
                   return values.map(v => v * 2)
                 }
@@ -104,7 +104,7 @@ class JudgeServiceTest {
     @Test
     void exceptionCodeSubmitTest() {
         // given
-        SubmitRequest submitRequest = new SubmitRequest("java", """                
+        SubmitRequest submitRequest = new SubmitRequest("java", """
                 class Solution {
                     public int[] solution(int N, int[] values) {
                         int[] answer = new int[values.length];
@@ -149,7 +149,7 @@ class JudgeServiceTest {
     @Test
     void javascriptCodeExecutionTest() {
         // given
-        ExecutionRequest executionRequest = new ExecutionRequest("javascript", """                
+        ExecutionRequest executionRequest = new ExecutionRequest("javascript", """
                 function solution(N, values) {
                   return values.map(v => v * 2)
                 }
@@ -190,7 +190,7 @@ class JudgeServiceTest {
     @Test
     void exceptionCodeExecutionTest() {
         // given
-        ExecutionRequest executionRequest = new ExecutionRequest("java", """                
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """
                 class Solution {
                     public int[] solution(int N, int[] values) {
                         int[] answer = new int[values.length];
@@ -217,7 +217,7 @@ class JudgeServiceTest {
                         "[2,4,6]", null)
         ));
         // given
-        ExecutionRequest executionRequest = new ExecutionRequest("java", """                
+        ExecutionRequest executionRequest = new ExecutionRequest("java", """
                 class Solution {
                     public int[] solution(int N, int[] values) {
                         int[] answer = new int[values.length];

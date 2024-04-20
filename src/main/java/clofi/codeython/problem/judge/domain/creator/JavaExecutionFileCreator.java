@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JavaExecutionFileCreator implements ExecutionFileCreator {
+    private static final String JAVA_LIBRARY_PATH = getJavaLibraryPath();
+
+    private static String getJavaLibraryPath() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win") || os.contains("mac")) {
+            return "./libs/*";
+        }
+        return "/home/gradle/project/libs/*";
+    }
 
     @Override
     public void create(List<String> inputTypes, String code, String route) {
@@ -63,7 +72,7 @@ public class JavaExecutionFileCreator implements ExecutionFileCreator {
 
     private void compile(String route) {
         ArrayList<String> commands = new ArrayList<>(
-                List.of("javac", "-cp", "./libs/*", "-sourcepath", "./" + route, String.format("%sMain.java", route)));
+                List.of("javac", "-cp", JAVA_LIBRARY_PATH, "-sourcepath", "./" + route, String.format("%sMain.java", route)));
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
         StringBuilder errorMessage = new StringBuilder();
