@@ -1,11 +1,13 @@
 package clofi.codeython.problem.judge.domain;
 
-import clofi.codeython.problem.judge.domain.runner.CodeRunner;
-import clofi.codeython.problem.domain.Hiddencase;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Testcase;
+import clofi.codeython.problem.judge.domain.runner.CodeRunner;
+import clofi.codeython.problem.judge.dto.ExecutionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -18,21 +20,14 @@ import org.springframework.stereotype.Component;
 public class ResultCalculator {
     private final Map<String, CodeRunner> codeRunnerMap;
 
-    public int calculate(String route, String language, List<Testcase> testcases, List<Hiddencase> hiddencases) {
+    public int judge(String route, String language, List<Testcase> testcases) {
         CodeRunner codeRunner = codeRunnerMap.get(LanguageType.getCodeRunnerName(language));
-        int total = hiddencases.size() + testcases.size();
+        int total = testcases.size();
         int success = 0;
 
         for (Testcase testcase : testcases) {
             String result = codeRunner.run(route, testcase.getInput());
             if (isMatch(result, testcase.getOutput())) {
-                success++;
-            }
-        }
-
-        for (Hiddencase hiddencase : hiddencases) {
-            String result = codeRunner.run(route, hiddencase.getInput());
-            if (isMatch(result, hiddencase.getOutput())) {
                 success++;
             }
         }
@@ -43,15 +38,38 @@ public class ResultCalculator {
     private boolean isMatch(String executionResult, String output) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            executionResult = mapper.writeValueAsString(mapper.readTree(executionResult));
-            output = mapper.writeValueAsString(mapper.readTree(output));
+            JsonNode actual = mapper.readTree(executionResult);
+            JsonNode expected = mapper.readTree(output);
+            return actual.equals(expected);
         } catch (JsonProcessingException ignored) {
         }
-        executionResult = executionResult.trim();
-        log.info("executionResult={}{}", System.lineSeparator(), executionResult);
-        log.info("output={}{}", System.lineSeparator(), output);
-
-        return executionResult.equals(output);
+        return false;
     }
 
+    public List<ExecutionResponse> execution(String route, String language, List<Testcase> testcases) {
+        CodeRunner codeRunner = codeRunnerMap.get(LanguageType.getCodeRunnerName(language));
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<ExecutionResponse> list = new ArrayList<>();
+        for (Testcase testcase : testcases) {
+            if (testcase.getDescription() == null) {
+                break;
+            }
+            String result = codeRunner.run(route, testcase.getInput());
+
+            JsonNode actual;
+            JsonNode expected;
+            try {
+                actual = mapper.readTree(result);
+                expected = mapper.readTree(testcase.getOutput());
+
+                result = mapper.writeValueAsString(actual);
+                list.add(new ExecutionResponse(actual.equals(expected), result));
+            } catch (JsonProcessingException ignored) {
+                list.add(new ExecutionResponse(false, result));
+            }
+        }
+
+        return list;
+    }
 }

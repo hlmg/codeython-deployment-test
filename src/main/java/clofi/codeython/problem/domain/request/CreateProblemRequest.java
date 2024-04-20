@@ -39,9 +39,6 @@ public class CreateProblemRequest {
 
     private List<TestcaseRequest> testcase;
 
-    private List<HiddencaseRequest> hiddencase;
-
-
     public Problem toProblem() {
         return new Problem(
                 title,
@@ -68,15 +65,6 @@ public class CreateProblemRequest {
                 inputCase,
                 outputCase,
                 description
-        );
-    }
-
-    public Hiddencase toHiddencase(
-            Problem problemNo, List<String> inputCase, String outputCase) {
-        return new Hiddencase(
-                problemNo,
-                inputCase,
-                outputCase
         );
     }
 

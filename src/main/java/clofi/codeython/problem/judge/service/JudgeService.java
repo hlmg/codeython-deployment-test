@@ -2,12 +2,12 @@ package clofi.codeython.problem.judge.service;
 
 import clofi.codeython.problem.judge.domain.ResultCalculator;
 import clofi.codeython.problem.judge.domain.creator.ExecutionFileCreator;
-import clofi.codeython.problem.judge.dto.JudgeRequest;
-import clofi.codeython.problem.domain.Hiddencase;
+import clofi.codeython.problem.judge.dto.ExecutionRequest;
+import clofi.codeython.problem.judge.dto.ExecutionResponse;
+import clofi.codeython.problem.judge.dto.SubmitRequest;
 import clofi.codeython.problem.domain.LanguageType;
 import clofi.codeython.problem.domain.Problem;
 import clofi.codeython.problem.domain.Testcase;
-import clofi.codeython.problem.repository.HiddencaseRepository;
 import clofi.codeython.problem.repository.ProblemRepository;
 import clofi.codeython.problem.repository.TestcaseRepository;
 import java.io.File;
@@ -32,9 +32,8 @@ public class JudgeService {
     private final ResultCalculator resultCalculator;
     private final ProblemRepository problemRepository;
     private final TestcaseRepository testcaseRepository;
-    private final HiddencaseRepository hiddencaseRepository;
 
-    public int judge(JudgeRequest judgeRequest, Long problemNo) {
+    public int submit(SubmitRequest submitRequest, Long problemNo) {
         Problem problem = problemRepository.findById(problemNo)
                 .orElseThrow(() -> new IllegalArgumentException("없는 문제 번호입니다."));
 
@@ -42,14 +41,13 @@ public class JudgeService {
         createFolder(route);
         try {
             ExecutionFileCreator executionFileCreator = executionFileCreatorMap
-                    .get(LanguageType.getCreatorName(judgeRequest.getLanguage()));
+                    .get(LanguageType.getCreatorName(submitRequest.language()));
 
-            executionFileCreator.create(problem.getType(), judgeRequest.getCode(), route);
+            executionFileCreator.create(problem.getType(), submitRequest.code(), route);
 
             List<Testcase> testcases = testcaseRepository.findAllByProblemProblemNo(problemNo);
-            List<Hiddencase> hiddencases = hiddencaseRepository.findAllByProblemProblemNo(problemNo);
 
-            return resultCalculator.calculate(route, judgeRequest.getLanguage(), testcases, hiddencases);
+            return resultCalculator.judge(route, submitRequest.language(), testcases);
         } finally {
             cleanup(route);
         }
@@ -68,6 +66,26 @@ public class JudgeService {
             FileUtils.deleteDirectory(new File(route));
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    public List<ExecutionResponse> execution(ExecutionRequest executionRequest, long problemNo) {
+        Problem problem = problemRepository.findById(problemNo)
+                .orElseThrow(() -> new IllegalArgumentException("없는 문제 번호입니다."));
+
+        String route = UUID.randomUUID() + "/";
+        createFolder(route);
+        try {
+            ExecutionFileCreator executionFileCreator = executionFileCreatorMap
+                    .get(LanguageType.getCreatorName(executionRequest.language()));
+
+            executionFileCreator.create(problem.getType(), executionRequest.code(), route);
+
+            List<Testcase> testcases = testcaseRepository.findAllByProblemProblemNo(problemNo);
+
+            return resultCalculator.execution(route, executionRequest.language(), testcases);
+        } finally {
+            cleanup(route);
         }
     }
 }

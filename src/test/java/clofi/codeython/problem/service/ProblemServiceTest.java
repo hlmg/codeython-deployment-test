@@ -9,7 +9,6 @@ import clofi.codeython.problem.domain.Record;
 import clofi.codeython.problem.domain.*;
 import clofi.codeython.problem.domain.request.BaseCodeRequest;
 import clofi.codeython.problem.domain.request.CreateProblemRequest;
-import clofi.codeython.problem.domain.request.HiddencaseRequest;
 import clofi.codeython.problem.domain.request.TestcaseRequest;
 import clofi.codeython.problem.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,8 +35,6 @@ class ProblemServiceTest {
     private LanguageRepository languageRepository;
     @Autowired
     private TestcaseRepository testcaseRepository;
-    @Autowired
-    private HiddencaseRepository hiddencaseRepository;
 	@Autowired
 	private MemberRepository memberRepository;
 	@Autowired
@@ -45,7 +42,6 @@ class ProblemServiceTest {
 
     @AfterEach
     void afterEach(){
-        hiddencaseRepository.deleteAllInBatch();
         testcaseRepository.deleteAllInBatch();
         languageRepository.deleteAllInBatch();
         recordRepository.deleteAllInBatch();
@@ -74,14 +70,8 @@ class ProblemServiceTest {
                 "a"
         ));
 
-        List<HiddencaseRequest> hiddencaseRequests = new ArrayList<>();
-        hiddencaseRequests.add(new HiddencaseRequest(
-                List.of("A, B","10, 20", "50, 60"),
-                "10"
-        ));
-
         CreateProblemRequest createProblemRequest =
-                getCreateProblemRequest(baseCodeRequests,testcaseRequests,hiddencaseRequests);
+                getCreateProblemRequest(baseCodeRequests,testcaseRequests);
 
         //when
         Long problemId = problemService.createProblem(createProblemRequest);
@@ -109,10 +99,6 @@ class ProblemServiceTest {
         assertThat(testcase.getInput()).containsExactly("a, b","3, 4", "5, 6");
         assertThat(testcase.getOutput()).isEqualTo("3");
         assertThat(testcase.getDescription()).isEqualTo("a");
-
-        Hiddencase hiddencase = hiddencaseRepository.findByProblem(problem);
-        assertThat(hiddencase.getInput()).containsExactly("A, B","10, 20", "50, 60");
-        assertThat(hiddencase.getOutput()).isEqualTo("10");
     }
 
     @DisplayName("문제 제목 중복")
@@ -147,14 +133,8 @@ class ProblemServiceTest {
                 "a"
         ));
 
-        List<HiddencaseRequest> hiddencaseRequests = new ArrayList<>();
-        hiddencaseRequests.add(new HiddencaseRequest(
-                List.of("A, B","10, 20", "50, 60"),
-                "10"
-        ));
-
         CreateProblemRequest createProblemRequest = getCreateProblemRequest(
-                baseCodeRequests, testcaseRequests, hiddencaseRequests);
+                baseCodeRequests, testcaseRequests);
 
         //then
         assertThatThrownBy(() ->
@@ -207,13 +187,8 @@ class ProblemServiceTest {
                 "a"
         ));
 
-        List<HiddencaseRequest> hiddencaseRequests1 = new ArrayList<>();
-        hiddencaseRequests1.add(new HiddencaseRequest(
-                List.of("A, B","10, 20", "50, 60"),
-                "10"
-        ));
         CreateProblemRequest createProblemRequest = getCreateProblemRequest(
-                baseCodeRequests1,testcaseRequests1,hiddencaseRequests1);
+                baseCodeRequests1,testcaseRequests1);
         Long problemId = problemService.createProblem(createProblemRequest);
 
         //when
@@ -241,13 +216,8 @@ class ProblemServiceTest {
                 "a"
         ));
 
-        List<HiddencaseRequest> hiddencaseRequests2 = new ArrayList<>();
-        hiddencaseRequests2.add(new HiddencaseRequest(
-                List.of("A, B","10, 20", "50, 60"),
-                "10"
-        ));
         CreateProblemRequest createProblemRequest2 = getCreateProblemRequest2(
-                baseCodeRequests2,testcaseRequests2,hiddencaseRequests2);
+                baseCodeRequests2,testcaseRequests2);
         Long problemId2 = problemService.createProblem(createProblemRequest2);
 
         //when
@@ -290,13 +260,8 @@ class ProblemServiceTest {
                 "a"
         ));
 
-        List<HiddencaseRequest> hiddencaseRequests1 = new ArrayList<>();
-        hiddencaseRequests1.add(new HiddencaseRequest(
-                List.of("A, B","10, 20", "50, 60"),
-                "10"
-        ));
         CreateProblemRequest createProblemRequest = getCreateProblemRequest(
-                baseCodeRequests1,testcaseRequests1,hiddencaseRequests1);
+                baseCodeRequests1,testcaseRequests1);
         Long problemId = problemService.createProblem(createProblemRequest);
 
         //when
@@ -309,8 +274,7 @@ class ProblemServiceTest {
 
     private static CreateProblemRequest getCreateProblemRequest(
             List<BaseCodeRequest> baseCodeRequests,
-            List<TestcaseRequest> testcaseRequests,
-            List<HiddencaseRequest> hiddencaseRequests
+            List<TestcaseRequest> testcaseRequests
     ) {
         return new CreateProblemRequest(
                 "where is koreanCow",
@@ -320,15 +284,13 @@ class ProblemServiceTest {
                 1,
                 List.of("String[][]", "int", "String"),
                 baseCodeRequests,
-                testcaseRequests,
-                hiddencaseRequests
+                testcaseRequests
         );
     }
 
     private static CreateProblemRequest getCreateProblemRequest2(
             List<BaseCodeRequest> baseCodeRequests,
-            List<TestcaseRequest> testcaseRequests,
-            List<HiddencaseRequest> hiddencaseRequests
+            List<TestcaseRequest> testcaseRequests
     ) {
         return new CreateProblemRequest(
                 "where is koreanCow2",
@@ -338,8 +300,7 @@ class ProblemServiceTest {
                 1,
                 List.of("String[][]", "int", "String"),
                 baseCodeRequests,
-                testcaseRequests,
-                hiddencaseRequests
+                testcaseRequests
         );
     }
 
