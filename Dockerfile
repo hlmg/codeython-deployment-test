@@ -3,9 +3,10 @@ FROM node
 WORKDIR /home/gradle/project
 COPY . .
 
-
-ENV JAVA_HOME /usr/lib/jvm/msopenjdk-21
-ENV PATH "${JAVA_HOME}/bin:${PATH}"
+RUN apt-get update && \
+    apt-get install -y openjdk-21-jdk && \
+    apt-get install -y nodejs && \
+    apt-get clean
 
 RUN env
 
