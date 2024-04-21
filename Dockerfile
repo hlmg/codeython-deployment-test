@@ -1,5 +1,5 @@
 # gradle:7.3.1-jdk17 이미지를 기반으로 함
-FROM krmp-d2hub-idock.9rum.cc/goorm/gradle:8.4.1-jdk21
+FROM krmp-d2hub-idock.9rum.cc/goorm/gradle:8.5.1-jdk21
 FROM node
 WORKDIR /home/gradle/project
 COPY . .
