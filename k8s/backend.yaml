@@ -17,12 +17,6 @@ spec:
       containers:
         - name: backend
           image: "krmp-d2hub-idock.9rum.cc/dev-test/repo_0e94fd80cb4f"
-          env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: secret
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
