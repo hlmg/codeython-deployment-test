@@ -18,31 +18,6 @@ spec:
         - name: backend
           image: "krmp-d2hub-idock.9rum.cc/dev-test/repo_055b5edeaa97"
           env:
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: host
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: database-name
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: username
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: root-password
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: server-secret
-                  key: port
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
