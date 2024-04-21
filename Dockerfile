@@ -8,7 +8,7 @@ RUN mkdir -p /root/.gradle && \
 
 RUN apt-get update && \
     apt-get install -y openjdk-21-jdk && \
-#    apt-get install -y nodejs && \
+    apt-get install -y nodejs && \
     apt-get clean
 
 RUN chmod +x ./gradlew && ./gradlew clean build
