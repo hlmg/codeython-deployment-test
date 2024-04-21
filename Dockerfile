@@ -4,7 +4,7 @@ WORKDIR /home/gradle/project
 COPY . .
 
 
-ENV JAVA_HOME /usr/lib/jvm/msopenjdk-21-ubuntu
+ENV JAVA_HOME /usr/lib/jvm/msopenjdk-21
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
 
 RUN env
