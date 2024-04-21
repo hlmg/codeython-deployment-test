@@ -5,7 +5,6 @@ COPY . .
 
 ENV JAVA_HOME /usr/lib/jvm/msopenjdk-21-ubuntu
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
-COPY --from=mcr.microsoft.com/openjdk/jdk:21-ubuntu $JAVA_HOME $JAVA_HOME
 
 RUN mkdir -p /root/.gradle && \
     echo -e "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
